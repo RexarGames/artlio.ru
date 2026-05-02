@@ -22,7 +22,6 @@ body {
   position: relative;
 }
 
-/* Матричный канвас */
 #matrix {
   position: fixed;
   top: 0;
@@ -33,7 +32,6 @@ body {
   opacity: 0.15;
 }
 
-/* === Шапка === */
 header {
   text-align: center;
   padding: 2rem 1rem;
@@ -49,7 +47,6 @@ header {
   letter-spacing: 4px;
 }
 
-/* Глитч-анимация */
 .glitch::before,
 .glitch::after {
   content: attr(data-text);
@@ -82,6 +79,7 @@ header {
   80% { clip: rect(34px, 9999px, 56px, 0); }
   100% { clip: rect(89px, 9999px, 98px, 0); }
 }
+
 @keyframes glitch-anim-2 {
   0% { clip: rect(65px, 9999px, 34px, 0); }
   20% { clip: rect(87px, 9999px, 12px, 0); }
@@ -91,7 +89,6 @@ header {
   100% { clip: rect(78px, 9999px, 33px, 0); }
 }
 
-/* === Навигация === */
 nav {
   display: flex;
   justify-content: center;
@@ -119,7 +116,6 @@ nav {
   border-radius: 2px;
 }
 
-/* === Контентные блоки === */
 main {
   flex: 1;
   max-width: 900px;
@@ -156,7 +152,6 @@ main {
   margin-bottom: 0.5rem;
 }
 
-/* Мастерская (загрузка) */
 .upload-form {
   display: flex;
   flex-direction: column;
@@ -182,7 +177,6 @@ button:hover {
   color: black;
 }
 
-/* Настройки */
 .settings-form {
   display: flex;
   flex-direction: column;
@@ -196,4 +190,42 @@ footer {
   padding: 1rem;
   border-top: 1px dashed var(--acid);
   color: #666;
+}
+
+/* ---------- Аватар (правый верхний угол) ---------- */
+#avatar-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 100;
+  cursor: pointer;
+  width: 48px;
+  height: 48px;
+}
+
+#avatar-container::before {
+  content: "";
+  display: block;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid var(--acid);
+  background: rgba(57, 255, 20, 0.1);
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+#user-avatar-img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid var(--acid);
+  object-fit: cover;
+  background: black;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: none;
+  z-index: 2;
 }
