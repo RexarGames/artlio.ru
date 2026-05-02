@@ -14,7 +14,7 @@ async function api(action, payload = {}) {
   }
 }
 
-// ---------- Auth ----------
+// Auth
 const AUTH_KEY = "dexxure_auth_token";
 const getToken = () => localStorage.getItem(AUTH_KEY);
 const setToken = (t) => localStorage.setItem(AUTH_KEY, t);
@@ -33,7 +33,7 @@ async function checkAuth() {
   return false;
 }
 
-// ---------- Matrix ----------
+// Matrix
 const canvas = document.getElementById("matrix");
 const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
@@ -54,7 +54,7 @@ function drawMatrix() {
 }
 setInterval(drawMatrix, 50);
 
-// ---------- Avatar ----------
+// Avatar
 const avatarContainer = document.createElement("div");
 avatarContainer.id = "avatar-container";
 avatarContainer.innerHTML = '<img id="user-avatar-img" src="" alt="аватар" title="Нажми, чтобы сменить" style="display:none;">';
@@ -89,25 +89,16 @@ avatarContainer.addEventListener("click", () => {
   }
 });
 
-// ---------- Navigation ----------
+// Navigation
 const nav = document.querySelector("nav");
 nav.style.display = "none";
 const navLinks = document.querySelectorAll(".nav-link");
 
 function showSection(sectionId) {
-  // Скрываем все секции
   document.querySelectorAll("#app .section").forEach(s => s.classList.remove("active"));
-
-  // Показываем нужную секцию
   const sectionEl = document.getElementById(`section-${sectionId}`);
-  if (sectionEl) {
-    sectionEl.classList.add("active");
-  } else {
-    // fallback
-    document.getElementById("section-posts")?.classList.add("active");
-  }
+  if (sectionEl) sectionEl.classList.add("active");
 
-  // Дополнительная инициализация
   if (sectionId === "posts") loadPosts();
   if (sectionId === "workshop") {
     const form = document.getElementById("upload-mod-form");
@@ -126,12 +117,12 @@ function showSection(sectionId) {
         currentUser = null;
         nav.style.display = "none";
         updateAvatar(null);
-        showAuthForm("signin");
+        hideApp();
+        showAuthOverlay("signin");
       });
     }
   }
 
-  // Подсветка текущей ссылки
   navLinks.forEach(link => link.classList.toggle("active", link.dataset.section === sectionId));
 }
 
@@ -149,7 +140,7 @@ window.addEventListener("popstate", () => {
   showSection(section);
 });
 
-// ---------- Posts ----------
+// Posts
 async function loadPosts() {
   const container = document.getElementById("posts-container");
   if (!container) return;
@@ -163,7 +154,7 @@ async function loadPosts() {
     </div>`).join("");
 }
 
-// ---------- Settings data ----------
+// Settings data
 let currentSettings = { theme: "cyber", volume: 0.8, avatar_url: null };
 
 async function loadSettings() {
@@ -180,19 +171,16 @@ async function saveSettings(theme, volume, avatar_url = undefined) {
   return ok;
 }
 
-// ---------- Auth Form ----------
-function showAuthForm(mode = "signin") {
-  // Скрываем все секции
-  document.querySelectorAll("#app .section").forEach(s => s.classList.remove("active"));
+// Auth overlay
+const authOverlay = document.getElementById("auth-overlay");
 
-  const main = document.getElementById("app");
-  // Вставляем форму авторизации
-  main.innerHTML = `
+function showAuthOverlay(mode = "signin") {
+  authOverlay.innerHTML = `
     <div class="auth-form">
       <h2 class="glitch" data-text="${mode === 'signin' ? 'ВХОД' : 'РЕГИСТРАЦИЯ'}">${mode === 'signin' ? 'ВХОД' : 'РЕГИСТРАЦИЯ'}</h2>
       <form id="auth-form">
-        <input type="email" id="auth-email" placeholder="Email" required>
-        <input type="password" id="auth-password" placeholder="Пароль" required minlength="6">
+        <input type="email" id="auth-email" placeholder="Email" required autocomplete="email">
+        <input type="password" id="auth-password" placeholder="Пароль" required minlength="6" autocomplete="current-password">
         <button type="submit">${mode === 'signin' ? 'Войти' : 'Зарегистрироваться'}</button>
       </form>
       <p id="auth-switch">
@@ -203,6 +191,7 @@ function showAuthForm(mode = "signin") {
       <p id="auth-error" style="color:red;"></p>
     </div>
   `;
+  authOverlay.style.display = "flex";
 
   document.getElementById("auth-form")?.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -213,65 +202,69 @@ function showAuthForm(mode = "signin") {
 
     if (ok) {
       if (action === "signup") {
-        // signUp теперь возвращает сессию, если не требуется подтверждение
         if (data?.session?.access_token) {
           setToken(data.session.access_token);
-          initApp();
+          hideAuthAndInit();
         } else if (data?.user?.email_confirmed_at === null) {
           document.getElementById("auth-error").textContent = "Требуется подтверждение email. Проверьте почту.";
         } else {
-          // Пробуем signIn, если сессии нет (старая логика)
           const signinRes = await api("signin", { email, password });
           if (signinRes.ok) {
             setToken(signinRes.data.session.access_token);
-            initApp();
+            hideAuthAndInit();
           } else {
             document.getElementById("auth-error").textContent = "Не удалось войти после регистрации.";
           }
         }
       } else {
         setToken(data.session.access_token);
-        initApp();
+        hideAuthAndInit();
       }
     } else {
       document.getElementById("auth-error").textContent = error || "Ошибка";
     }
   });
 
-  document.getElementById("switch-to-signup")?.addEventListener("click", (e) => { e.preventDefault(); showAuthForm("signup"); });
-  document.getElementById("switch-to-signin")?.addEventListener("click", (e) => { e.preventDefault(); showAuthForm("signin"); });
+  document.getElementById("switch-to-signup")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    showAuthOverlay("signup");
+  });
+  document.getElementById("switch-to-signin")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    showAuthOverlay("signin");
+  });
 }
 
-// ---------- Init after login ----------
+function hideAuthAndInit() {
+  authOverlay.style.display = "none";
+  initApp();
+}
+
+function hideApp() {
+  // скрываем навигацию и все секции, показываем оверлей
+  nav.style.display = "none";
+  document.querySelectorAll("#app .section").forEach(s => s.classList.remove("active"));
+}
+
 async function initApp() {
   nav.style.display = "flex";
-  // Восстанавливаем секции, если были удалены формой авторизации
-  const main = document.getElementById("app");
-  if (!document.getElementById("section-posts")) {
-    // если вдруг innerHTML стер секции, но такого быть не должно, но перестрахуемся
-    main.innerHTML = `
-      <div id="section-posts" class="section"><div id="posts-container">Загрузка постов...</div></div>
-      <div id="section-team" class="section"><h2 class="glitch" data-text="НАША КОМАНДА">НАША КОМАНДА</h2>...</div>
-      ...
-    `;
-  }
   currentSettings = await loadSettings();
   updateAvatar(currentSettings.avatar_url);
   showSection(location.hash.slice(1) || "posts");
 }
 
-// ---------- Старт ----------
+// Старт
 (async () => {
   try {
     const isLogged = await checkAuth();
     if (isLogged) {
+      authOverlay.style.display = "none";
       await initApp();
     } else {
-      showAuthForm("signin");
+      showAuthOverlay("signin");
     }
   } catch (e) {
     console.error("App start error", e);
-    const main = document.getElementById("app");
-    main.innerHTML = `<div style="color:red;text-align:center;margin-top:2rem;">Критическая ошибка. Обновите страницу.</div>`;
+    authOverlay.innerHTML = `<div style="color:red;">Критическая ошибка. Обновите страницу.</div>`;
   }
 })();
