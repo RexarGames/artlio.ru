@@ -54,20 +54,22 @@ function drawMatrix() {
 }
 setInterval(drawMatrix, 50);
 
-// ---------- Templates ----------
-const templatesHTML = `
-  <template id="tmpl-posts">
-    <div class="section active"><div id="posts-container">Загрузка постов...</div></div>
-  </template>
-  <template id="tmpl-team">
+// ---------- HTML-строки разделов ----------
+const sections = {
+  posts: `
+    <div class="section active">
+      <div id="posts-container">Загрузка постов...</div>
+    </div>
+  `,
+  team: `
     <div class="section">
       <h2 class="glitch" data-text="НАША КОМАНДА">НАША КОМАНДА</h2>
       <div class="team-member"><strong>Босс</strong> – @Dexxure<p>Основатель, главный идеолог.</p></div>
       <div class="team-member"><strong>Разработчик</strong> – @code_ghost<p>Пишет код, оптимизирует баги.</p></div>
       <p style="margin-top:1rem;">Полный состав появится позже, когда будут ссылки.</p>
     </div>
-  </template>
-  <template id="tmpl-workshop">
+  `,
+  workshop: `
     <div class="section">
       <h2 class="glitch" data-text="МАСТЕРСКАЯ">МАСТЕРСКАЯ</h2>
       <p>Загружай свои моды для игр Dexxure Games.</p>
@@ -80,8 +82,8 @@ const templatesHTML = `
       <div id="mods-list"></div>
       <p class="small" style="margin-top:1rem;">Функция в стадии тестирования.</p>
     </div>
-  </template>
-  <template id="tmpl-about">
+  `,
+  about: `
     <div class="section">
       <h2 class="glitch" data-text="ИНФОРМАЦИЯ">ИНФОРМАЦИЯ</h2>
       <p><strong>Dexxure Games &copy; 2023-2026 DEXXURE GAMES. Все права защищены.</strong></p>
@@ -93,15 +95,14 @@ const templatesHTML = `
       </ul>
       <p>DEXXURE Games™ — это развитие, идеи и постоянное движение вперёд. Мы делаем игры, в которые хотим играть сами.</p>
     </div>
-  </template>
-  <template id="tmpl-settings">
+  `,
+  settings: `
     <div class="section">
       <h2 class="glitch" data-text="НАСТРОЙКИ">НАСТРОЙКИ</h2>
       <button id="logout-btn" style="margin-top:1rem; background:#330000;">Выйти из аккаунта</button>
     </div>
-  </template>
-`;
-document.body.insertAdjacentHTML("beforeend", templatesHTML);
+  `
+};
 
 // ---------- Avatar ----------
 const avatarContainer = document.createElement("div");
@@ -145,18 +146,35 @@ const main = document.getElementById("app");
 const navLinks = document.querySelectorAll(".nav-link");
 
 function showSection(sectionId) {
-  main.innerHTML = "";
-  const template = document.getElementById(`tmpl-${sectionId}`);
-  if (template) {
-    const clone = template.content.cloneNode(true);
-    main.appendChild(clone);
-  } else {
+  if (!sections[sectionId]) {
     main.innerHTML = `<p>Раздел "${sectionId}" не найден</p>`;
+    return;
   }
+  main.innerHTML = sections[sectionId];
 
-  if (sectionId === "settings") initSettings();
-  if (sectionId === "posts") loadPosts();
-  if (sectionId === "workshop") initWorkshop();
+  // Активируем нужные действия
+  if (sectionId === "settings") {
+    document.getElementById("logout-btn")?.addEventListener("click", async () => {
+      await api("signout", { token: getToken() });
+      clearToken();
+      currentUser = null;
+      nav.style.display = "none";
+      updateAvatar(null);
+      showAuthForm("signin");
+    });
+  }
+  if (sectionId === "posts") {
+    loadPosts();
+  }
+  if (sectionId === "workshop") {
+    const form = document.getElementById("upload-mod-form");
+    if (form) {
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        alert("Загрузка пока не подключена. Ждём интеграции Supabase Storage.");
+      });
+    }
+  }
 
   navLinks.forEach(link => {
     link.classList.toggle("active", link.dataset.section === sectionId);
@@ -197,17 +215,7 @@ async function loadPosts() {
     </div>`).join("");
 }
 
-function initWorkshop() {
-  const form = document.getElementById("upload-mod-form");
-  if (form) {
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      alert("Загрузка пока не подключена. Ждём интеграции Supabase Storage.");
-    });
-  }
-}
-
-// ---------- Settings (упрощённая) ----------
+// ---------- Settings data ----------
 let currentSettings = { theme: "cyber", volume: 0.8, avatar_url: null };
 
 async function loadSettings() {
@@ -222,18 +230,6 @@ async function saveSettings(theme, volume, avatar_url = undefined) {
   if (avatar_url !== undefined) payload.avatar_url = avatar_url;
   const { ok } = await api("saveSettings", payload);
   return ok;
-}
-
-function initSettings() {
-  // Только выход
-  document.getElementById("logout-btn")?.addEventListener("click", async () => {
-    await api("signout", { token: getToken() });
-    clearToken();
-    currentUser = null;
-    nav.style.display = "none";
-    updateAvatar(null);
-    showAuthForm("signin");
-  });
 }
 
 // ---------- Auth Form ----------
@@ -299,7 +295,7 @@ async function initApp() {
   showSection(location.hash.slice(1) || "posts");
 }
 
-// ---------- Безопасный старт ----------
+// ---------- Старт ----------
 (async () => {
   try {
     const isLogged = await checkAuth();
