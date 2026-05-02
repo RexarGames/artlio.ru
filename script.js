@@ -1,28 +1,34 @@
 const API_URL = "https://llihkhqbixjgvcltcajn.supabase.co/functions/v1/api";
 
 async function api(action, payload = {}) {
-  const resp = await fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action, payload }),
-  });
-  return resp.json();
+  try {
+    const resp = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action, payload }),
+    });
+    return await resp.json();
+  } catch (e) {
+    console.error("API error", e);
+    return { ok: false, error: "Сетевая ошибка" };
+  }
 }
 
 // ---------- Auth ----------
 const AUTH_KEY = "dexxure_auth_token";
-function getToken() { return localStorage.getItem(AUTH_KEY); }
-function setToken(t) { localStorage.setItem(AUTH_KEY, t); }
-function clearToken() { localStorage.removeItem(AUTH_KEY); }
+const getToken = () => localStorage.getItem(AUTH_KEY);
+const setToken = (t) => localStorage.setItem(AUTH_KEY, t);
+const clearToken = () => localStorage.removeItem(AUTH_KEY);
 let currentUser = null;
 
 async function checkAuth() {
   const token = getToken();
   if (!token) return false;
-  try {
-    const { ok, data } = await api("getUser", { token });
-    if (ok && data) { currentUser = data; return true; }
-  } catch (e) { console.error("checkAuth failed", e); }
+  const { ok, data } = await api("getUser", { token });
+  if (ok && data) {
+    currentUser = data;
+    return true;
+  }
   clearToken();
   return false;
 }
@@ -36,7 +42,7 @@ async function loadSettings() {
 
 async function saveSettings(theme, volume, avatar_url = undefined) {
   const token = getToken();
-  const payload: any = { token, theme, volume };
+  const payload = { token, theme, volume };
   if (avatar_url !== undefined) payload.avatar_url = avatar_url;
   const { ok } = await api("saveSettings", payload);
   return ok;
@@ -63,17 +69,17 @@ function drawMatrix() {
 }
 setInterval(drawMatrix, 50);
 
-// ---------- Templates ----------
+// ---------- Шаблоны сразу ----------
 const templatesHTML = `
-<template id="tmpl-posts"><div class="section active"><div id="posts-container">Загрузка постов...</div></div></template>
-<template id="tmpl-team"><div class="section"><h2 class="glitch" data-text="НАША КОМАНДА">НАША КОМАНДА</h2><div class="team-member"><strong>Босс</strong> – @Dexxure<p>Основатель, главный идеолог.</p></div><div class="team-member"><strong>Разработчик</strong> – @code_ghost<p>Пишет код, оптимизирует баги.</p></div><p style="margin-top:1rem;">Полный состав появится позже, когда будут ссылки.</p></div></template>
-<template id="tmpl-workshop"><div class="section"><h2 class="glitch" data-text="МАСТЕРСКАЯ">МАСТЕРСКАЯ</h2><p>Загружай свои моды для игр Dexxure Games.</p><form id="upload-mod-form" class="upload-form"><input type="text" id="mod-name" placeholder="Название мода" required><textarea id="mod-desc" placeholder="Описание" rows="3"></textarea><input type="file" id="mod-file" required><button type="submit">Загрузить</button></form><div id="mods-list"></div><p class="small" style="margin-top:1rem;">Функция в стадии тестирования.</p></div></template>
-<template id="tmpl-about"><div class="section"><h2 class="glitch" data-text="ИНФОРМАЦИЯ">ИНФОРМАЦИЯ</h2><p><strong>Dexxure Games &copy; 2023-2026 DEXXURE GAMES. Все права защищены.</strong></p><p>DEXXURE Games™ — независимая игровая команда, занимающаяся разработкой видеоигр на движках Unity. Мы создаём проекты разных жанров, экспериментируем с механиками и уделяем особое внимание атмосфере, геймплею и качеству исполнения.</p><p>У DEXXURE Games есть собственный игровой Launcher — DG Launcher, в котором будет собрана большая часть наших текущих и будущих проектов. Это единая платформа для удобного доступа к нашим играм, обновлениям и новостям.</p><p>Мы активно развиваем своё сообщество:</p><ul><li>ведём собственный канал, где делимся прогрессом разработки, анонсами и закулисьем создания игр;</li></ul><p>DEXXURE Games™ — это развитие, идеи и постоянное движение вперёд. Мы делаем игры, в которые хотим играть сами.</p></div></template>
-<template id="tmpl-settings"><div class="section"><h2 class="glitch" data-text="НАСТРОЙКИ">НАСТРОЙКИ</h2><form id="settings-form" class="settings-form"><label>Тема (в разработке):<select id="theme-select"><option value="cyber">Cyber</option><option value="acid">Acid</option><option value="dark">Dark</option></select></label><label>Громкость звуков (0-1):<input type="range" id="volume-range" min="0" max="1" step="0.1" value="0.8"><span id="volume-value">0.8</span></label><button type="submit">Сохранить настройки</button></form><p id="settings-status"></p><button id="logout-btn" style="margin-top:1rem; background:#330000;">Выйти</button></div></template>
+  <template id="tmpl-posts"><div class="section active"><div id="posts-container">Загрузка постов...</div></div></template>
+  <template id="tmpl-team"><div class="section"><h2 class="glitch" data-text="НАША КОМАНДА">НАША КОМАНДА</h2><div class="team-member"><strong>Босс</strong> – @Dexxure<p>Основатель, главный идеолог.</p></div><div class="team-member"><strong>Разработчик</strong> – @code_ghost<p>Пишет код, оптимизирует баги.</p></div><p style="margin-top:1rem;">Полный состав появится позже, когда будут ссылки.</p></div></template>
+  <template id="tmpl-workshop"><div class="section"><h2 class="glitch" data-text="МАСТЕРСКАЯ">МАСТЕРСКАЯ</h2><p>Загружай свои моды для игр Dexxure Games.</p><form id="upload-mod-form" class="upload-form"><input type="text" id="mod-name" placeholder="Название мода" required><textarea id="mod-desc" placeholder="Описание" rows="3"></textarea><input type="file" id="mod-file" required><button type="submit">Загрузить</button></form><div id="mods-list"></div><p class="small" style="margin-top:1rem;">Функция в стадии тестирования.</p></div></template>
+  <template id="tmpl-about"><div class="section"><h2 class="glitch" data-text="ИНФОРМАЦИЯ">ИНФОРМАЦИЯ</h2><p><strong>Dexxure Games &copy; 2023-2026 DEXXURE GAMES. Все права защищены.</strong></p><p>DEXXURE Games™ — независимая игровая команда, занимающаяся разработкой видеоигр на движках Unity. Мы создаём проекты разных жанров, экспериментируем с механиками и уделяем особое внимание атмосфере, геймплею и качеству исполнения.</p><p>У DEXXURE Games есть собственный игровой Launcher — DG Launcher, в котором будет собрана большая часть наших текущих и будущих проектов. Это единая платформа для удобного доступа к нашим играм, обновлениям и новостям.</p><p>Мы активно развиваем своё сообщество:</p><ul><li>ведём собственный канал, где делимся прогрессом разработки, анонсами и закулисьем создания игр;</li></ul><p>DEXXURE Games™ — это развитие, идеи и постоянное движение вперёд. Мы делаем игры, в которые хотим играть сами.</p></div></template>
+  <template id="tmpl-settings"><div class="section"><h2 class="glitch" data-text="НАСТРОЙКИ">НАСТРОЙКИ</h2><form id="settings-form" class="settings-form"><label>Тема (в разработке):<select id="theme-select"><option value="cyber">Cyber</option><option value="acid">Acid</option><option value="dark">Dark</option></select></label><label>Громкость звуков (0-1):<input type="range" id="volume-range" min="0" max="1" step="0.1" value="0.8"><span id="volume-value">0.8</span></label><button type="submit">Сохранить настройки</button></form><p id="settings-status"></p><button id="logout-btn" style="margin-top:1rem; background:#330000;">Выйти</button></div></template>
 `;
 document.body.insertAdjacentHTML("beforeend", templatesHTML);
 
-// ---------- Avatar container ----------
+// ---------- Avatar ----------
 const avatarContainer = document.createElement("div");
 avatarContainer.id = "avatar-container";
 avatarContainer.innerHTML = '<img id="user-avatar-img" src="" alt="аватар" title="Нажми, чтобы сменить" style="display:none;">';
@@ -91,18 +97,13 @@ function updateAvatar(url) {
   }
 }
 
-// Обработчик клика по аватарке
 avatarContainer.addEventListener("click", () => {
   if (!currentUser) return;
-  const currentUrl = (currentSettings && currentSettings.avatar_url) || "";
+  const currentUrl = currentSettings.avatar_url || "";
   const newUrl = prompt("Введите URL изображения для аватара:", currentUrl);
   if (newUrl !== null) {
     (async () => {
-      const success = await saveSettings(
-        currentSettings.theme,
-        currentSettings.volume,
-        newUrl
-      );
+      const success = await saveSettings(currentSettings.theme, currentSettings.volume, newUrl);
       if (success) {
         currentSettings.avatar_url = newUrl;
         updateAvatar(newUrl);
@@ -123,24 +124,30 @@ function showSection(sectionId) {
   main.innerHTML = "";
   const template = document.getElementById(`tmpl-${sectionId}`);
   if (template) {
-    main.appendChild(template.content.cloneNode(true));
+    const clone = template.content.cloneNode(true);
+    main.appendChild(clone);
   } else {
     main.innerHTML = "<p>Раздел не найден</p>";
   }
+
   if (sectionId === "settings") initSettings();
   if (sectionId === "posts") loadPosts();
   if (sectionId === "workshop") initWorkshop();
-  navLinks.forEach(l => l.classList.toggle("active", l.dataset.section === sectionId));
+
+  navLinks.forEach(link => {
+    link.classList.toggle("active", link.dataset.section === sectionId);
+  });
 }
 
 navLinks.forEach(link => {
-  link.addEventListener("click", e => {
+  link.addEventListener("click", (e) => {
     e.preventDefault();
     const section = link.dataset.section;
     showSection(section);
     history.pushState(null, "", `#${section}`);
   });
 });
+
 window.addEventListener("popstate", () => {
   const section = location.hash.slice(1) || "posts";
   showSection(section);
@@ -148,30 +155,30 @@ window.addEventListener("popstate", () => {
 
 // ---------- Posts ----------
 async function loadPosts() {
-  const c = document.getElementById("posts-container");
-  if (!c) return;
+  const container = document.getElementById("posts-container");
+  if (!container) return;
   const { ok, data } = await api("getPosts");
   if (!ok) {
-    c.innerHTML = "Ошибка загрузки.";
+    container.innerHTML = "Ошибка загрузки.";
     return;
   }
   if (data.length === 0) {
-    c.innerHTML = "Постов пока нет. Они появятся после первого запуска парсинга Telegram.";
+    container.innerHTML = "Постов пока нет. Они появятся после первого запуска парсинга Telegram.";
     return;
   }
-  c.innerHTML = data.map(p => `
+  container.innerHTML = data.map(p => `
     <div class="post-card">
       <time>${new Date(p.posted_at).toLocaleString("ru-RU")}</time>
-      <div>${p.content.replace(/\n/g, "<br>")}</div>
+      <div>${(p.content || "").replace(/\n/g, "<br>")}</div>
     </div>`).join("");
 }
 
 function initWorkshop() {
   const form = document.getElementById("upload-mod-form");
   if (form) {
-    form.addEventListener("submit", e => {
+    form.addEventListener("submit", (e) => {
       e.preventDefault();
-      alert("Загрузка пока в разработке.");
+      alert("Загрузка пока не подключена. Ждём интеграции Supabase Storage.");
     });
   }
 }
@@ -193,16 +200,17 @@ async function initSettings() {
     volumeRange.oninput = () => { volumeValue.textContent = volumeRange.value; };
   }
 
-  document.getElementById("settings-form")?.addEventListener("submit", async e => {
-    e.preventDefault();
-    const theme = themeSelect.value;
-    const volume = parseFloat(volumeRange.value);
-    const ok = await saveSettings(theme, volume);
-    if (status) {
-      status.textContent = ok ? "Настройки сохранены." : "Ошибка сохранения.";
-      status.style.color = ok ? "var(--acid)" : "red";
-    }
-  });
+  const form = document.getElementById("settings-form");
+  if (form) {
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const ok = await saveSettings(themeSelect.value, parseFloat(volumeRange.value));
+      if (status) {
+        status.textContent = ok ? "Настройки сохранены." : "Ошибка сохранения.";
+        status.style.color = ok ? "var(--acid)" : "red";
+      }
+    });
+  }
 
   document.getElementById("logout-btn")?.addEventListener("click", async () => {
     await api("signout", { token: getToken() });
@@ -216,7 +224,7 @@ async function initSettings() {
   updateAvatar(currentSettings.avatar_url);
 }
 
-// ---------- Auth form ----------
+// ---------- Auth Form ----------
 function showAuthForm(mode = "signin") {
   main.innerHTML = `
     <div class="auth-form">
@@ -227,15 +235,15 @@ function showAuthForm(mode = "signin") {
         <button type="submit">${mode === 'signin' ? 'Войти' : 'Зарегистрироваться'}</button>
       </form>
       <p id="auth-switch">
-        ${mode === 'signin'
-          ? 'Нет аккаунта? <a href="#" id="switch-to-signup">Регистрация</a>'
+        ${mode === 'signin' 
+          ? 'Нет аккаунта? <a href="#" id="switch-to-signup">Регистрация</a>' 
           : 'Есть аккаунт? <a href="#" id="switch-to-signin">Войти</a>'}
       </p>
       <p id="auth-error" style="color:red;"></p>
     </div>
   `;
 
-  document.getElementById("auth-form").addEventListener("submit", async (e) => {
+  document.getElementById("auth-form")?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const email = document.getElementById("auth-email").value;
     const password = document.getElementById("auth-password").value;
@@ -244,12 +252,13 @@ function showAuthForm(mode = "signin") {
 
     if (ok) {
       if (mode === "signup") {
+        // После регистрации сразу входим
         const signinRes = await api("signin", { email, password });
         if (signinRes.ok) {
           setToken(signinRes.data.session.access_token);
           initApp();
         } else {
-          document.getElementById("auth-error").textContent =
+          document.getElementById("auth-error").textContent = 
             "Регистрация прошла, но войти не удалось. Попробуйте войти вручную.";
         }
       } else {
@@ -261,11 +270,11 @@ function showAuthForm(mode = "signin") {
     }
   });
 
-  document.getElementById("switch-to-signup")?.addEventListener("click", e => {
+  document.getElementById("switch-to-signup")?.addEventListener("click", (e) => {
     e.preventDefault();
     showAuthForm("signup");
   });
-  document.getElementById("switch-to-signin")?.addEventListener("click", e => {
+  document.getElementById("switch-to-signin")?.addEventListener("click", (e) => {
     e.preventDefault();
     showAuthForm("signin");
   });
@@ -274,13 +283,12 @@ function showAuthForm(mode = "signin") {
 // ---------- Init after login ----------
 async function initApp() {
   nav.style.display = "flex";
-  // Загружаем настройки и аватар
   currentSettings = await loadSettings();
   updateAvatar(currentSettings.avatar_url);
   showSection(location.hash.slice(1) || "posts");
 }
 
-// ---------- Safe start ----------
+// ---------- Безопасный старт ----------
 (async () => {
   try {
     const isLogged = await checkAuth();
