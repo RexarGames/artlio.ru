@@ -46,7 +46,7 @@ async function checkAuth() {
 async function loadSettings() {
   const token = getToken();
   const response = await api("loadSettings", { token });
-  if (response.ok) return response.data || { theme: "cyber", volume: 0.8 };
+  if (response.ok && response.data) return response.data;
   return { theme: "cyber", volume: 0.8 };
 }
 
@@ -77,110 +77,8 @@ function drawMatrix() {
 }
 setInterval(drawMatrix, 50);
 
-// ----- Интерфейс -----
-const main = document.getElementById("app");
-const nav = document.querySelector("nav");
-
-// Скрываем навигацию до входа
-nav.style.display = "none";
-
-// Форма авторизации (показывается первой)
-function showAuthForm(mode = "signin") {
-  main.innerHTML = `
-    <div class="auth-form">
-      <h2 class="glitch" data-text="${mode === 'signin' ? 'ВХОД' : 'РЕГИСТРАЦИЯ'}">${mode === 'signin' ? 'ВХОД' : 'РЕГИСТРАЦИЯ'}</h2>
-      <form id="auth-form">
-        <input type="email" id="auth-email" placeholder="Email" required>
-        <input type="password" id="auth-password" placeholder="Пароль" required minlength="6">
-        <button type="submit">${mode === 'signin' ? 'Войти' : 'Зарегистрироваться'}</button>
-      </form>
-      <p id="auth-switch">
-        ${mode === 'signin'
-          ? 'Нет аккаунта? <a href="#" id="switch-to-signup">Регистрация</a>'
-          : 'Есть аккаунт? <a href="#" id="switch-to-signin">Войти</a>'}
-      </p>
-      <p id="auth-error" style="color: red;"></p>
-    </div>
-  `;
-
-  document.getElementById("auth-form").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = document.getElementById("auth-email").value;
-    const password = document.getElementById("auth-password").value;
-    const action = mode === "signin" ? "signin" : "signup";
-    const { ok, data, error } = await api(action, { email, password });
-
-    if (ok) {
-      if (mode === "signup") {
-        // После регистрации сразу входим (т.к. signUp не всегда возвращает session)
-        const signinRes = await api("signin", { email, password });
-        if (signinRes.ok) {
-          setToken(signinRes.data.session.access_token);
-          initApp();
-        } else {
-          document.getElementById("auth-error").textContent = "Регистрация прошла, но войти не удалось. Попробуйте войти вручную.";
-        }
-      } else {
-        setToken(data.session.access_token);
-        initApp();
-      }
-    } else {
-      document.getElementById("auth-error").textContent = error || "Ошибка";
-    }
-  });
-
-  document.getElementById("switch-to-signup")?.addEventListener("click", (e) => {
-    e.preventDefault();
-    showAuthForm("signup");
-  });
-  document.getElementById("switch-to-signin")?.addEventListener("click", (e) => {
-    e.preventDefault();
-    showAuthForm("signin");
-  });
-}
-
-// Инициализация основного интерфейса после входа
-async function initApp() {
-  nav.style.display = "flex";
-  const initialSection = location.hash.slice(1) || "posts";
-  showSection(initialSection);
-}
-
-// Навигация
-const navLinks = document.querySelectorAll(".nav-link");
-
-function showSection(sectionId) {
-  main.innerHTML = "";
-  const template = document.getElementById(`tmpl-${sectionId}`);
-  if (template) {
-    const clone = template.content.cloneNode(true);
-    main.appendChild(clone);
-  }
-  if (sectionId === "settings") initSettings();
-  if (sectionId === "posts") loadPosts();
-  if (sectionId === "workshop") initWorkshop();
-
-  navLinks.forEach(link => {
-    link.classList.toggle("active", link.dataset.section === sectionId);
-  });
-}
-
-navLinks.forEach(link => {
-  link.addEventListener("click", (e) => {
-    e.preventDefault();
-    const section = link.dataset.section;
-    showSection(section);
-    history.pushState(null, "", `#${section}`);
-  });
-});
-
-window.addEventListener("popstate", () => {
-  const section = location.hash.slice(1) || "posts";
-  showSection(section);
-});
-
-// Шаблоны (обновлённый tmpl-about и остальные)
-const templates = `
+// ----- Готовим шаблоны заранее -----
+const templatesHTML = `
   <template id="tmpl-posts">
     <div class="section active">
       <div id="posts-container">Загрузка постов...</div>
@@ -220,14 +118,14 @@ const templates = `
   <template id="tmpl-about">
     <div class="section">
       <h2 class="glitch" data-text="ИНФОРМАЦИЯ">ИНФОРМАЦИЯ</h2>
-      <p>Dexxure Games © 2023-2026 DEXXURE GAMES. Все права защищены.</p>
-      <p>DEXXURE Games™ — независимая игровая команда, занимающаяся разработкой видеоигр на движках Unity. Мы создаём проекты разных жанров, экспериментируем с механиками и уделяем особое внимание атмосфере, геймплею и качеству исполнения.</p>
+      <p><strong>Dexxure Games &copy; 2023-2026 DEXXURE GAMES. Все права защищены.</strong></p>
+      <p>DEXXURE Games&trade; — независимая игровая команда, занимающаяся разработкой видеоигр на движках Unity. Мы создаём проекты разных жанров, экспериментируем с механиками и уделяем особое внимание атмосфере, геймплею и качеству исполнения.</p>
       <p>У DEXXURE Games есть собственный игровой Launcher — DG Launcher, в котором будет собрана большая часть наших текущих и будущих проектов. Это единая платформа для удобного доступа к нашим играм, обновлениям и новостям.</p>
       <p>Мы активно развиваем своё сообщество:</p>
       <ul>
         <li>ведём собственный канал, где делимся прогрессом разработки, анонсами и закулисьем создания игр;</li>
       </ul>
-      <p>DEXXURE Games™ — это развитие, идеи и постоянное движение вперёд. Мы делаем игры, в которые хотим играть сами.</p>
+      <p>DEXXURE Games&trade; — это развитие, идеи и постоянное движение вперёд. Мы делаем игры, в которые хотим играть сами.</p>
     </div>
   </template>
 
@@ -256,9 +154,50 @@ const templates = `
   </template>
 `;
 
-document.body.insertAdjacentHTML("beforeend", templates);
+// Вставляем шаблоны в body сразу, до вызова initApp
+document.body.insertAdjacentHTML("beforeend", templatesHTML);
 
-// Функции разделов
+// ----- Навигация -----
+const nav = document.querySelector("nav");
+nav.style.display = "none";
+
+const main = document.getElementById("app");
+const navLinks = document.querySelectorAll(".nav-link");
+
+function showSection(sectionId) {
+  main.innerHTML = "";
+  const template = document.getElementById(`tmpl-${sectionId}`);
+  if (template) {
+    const clone = template.content.cloneNode(true);
+    main.appendChild(clone);
+  } else {
+    main.innerHTML = "<p>Раздел не найден</p>";
+  }
+
+  if (sectionId === "settings") initSettings();
+  if (sectionId === "posts") loadPosts();
+  if (sectionId === "workshop") initWorkshop();
+
+  navLinks.forEach(link => {
+    link.classList.toggle("active", link.dataset.section === sectionId);
+  });
+}
+
+navLinks.forEach(link => {
+  link.addEventListener("click", (e) => {
+    e.preventDefault();
+    const section = link.dataset.section;
+    showSection(section);
+    history.pushState(null, "", `#${section}`);
+  });
+});
+
+window.addEventListener("popstate", () => {
+  const section = location.hash.slice(1) || "posts";
+  showSection(section);
+});
+
+// ----- Функции разделов -----
 async function loadPosts() {
   const container = document.getElementById("posts-container");
   if (!container) return;
@@ -326,7 +265,6 @@ async function initSettings() {
     });
   }
 
-  // Кнопка выхода
   document.getElementById("logout-btn")?.addEventListener("click", async () => {
     const token = getToken();
     await api("signout", { token });
@@ -335,6 +273,67 @@ async function initSettings() {
     nav.style.display = "none";
     showAuthForm("signin");
   });
+}
+
+// ----- Форма входа -----
+function showAuthForm(mode = "signin") {
+  main.innerHTML = `
+    <div class="auth-form">
+      <h2 class="glitch" data-text="${mode === 'signin' ? 'ВХОД' : 'РЕГИСТРАЦИЯ'}">${mode === 'signin' ? 'ВХОД' : 'РЕГИСТРАЦИЯ'}</h2>
+      <form id="auth-form">
+        <input type="email" id="auth-email" placeholder="Email" required>
+        <input type="password" id="auth-password" placeholder="Пароль" required minlength="6">
+        <button type="submit">${mode === 'signin' ? 'Войти' : 'Зарегистрироваться'}</button>
+      </form>
+      <p id="auth-switch">
+        ${mode === 'signin'
+          ? 'Нет аккаунта? <a href="#" id="switch-to-signup">Регистрация</a>'
+          : 'Есть аккаунт? <a href="#" id="switch-to-signin">Войти</a>'}
+      </p>
+      <p id="auth-error" style="color: red;"></p>
+    </div>
+  `;
+
+  document.getElementById("auth-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("auth-email").value;
+    const password = document.getElementById("auth-password").value;
+    const action = mode === "signin" ? "signin" : "signup";
+    const { ok, data, error } = await api(action, { email, password });
+
+    if (ok) {
+      if (mode === "signup") {
+        const signinRes = await api("signin", { email, password });
+        if (signinRes.ok) {
+          setToken(signinRes.data.session.access_token);
+          initApp();
+        } else {
+          document.getElementById("auth-error").textContent = "Регистрация прошла, но войти не удалось. Попробуйте войти вручную.";
+        }
+      } else {
+        setToken(data.session.access_token);
+        initApp();
+      }
+    } else {
+      document.getElementById("auth-error").textContent = error || "Ошибка";
+    }
+  });
+
+  document.getElementById("switch-to-signup")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    showAuthForm("signup");
+  });
+  document.getElementById("switch-to-signin")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    showAuthForm("signin");
+  });
+}
+
+// Инициализация основного интерфейса после входа
+async function initApp() {
+  nav.style.display = "flex";
+  const initialSection = location.hash.slice(1) || "posts";
+  showSection(initialSection);
 }
 
 // Старт приложения
