@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dexxure Multisite — о команде</title>
+  <link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+  <div class="site-shell">
+    <header class="topbar">
+  <a class="brand" href="home.html"><span class="logo-mark">DG</span><span>Dexxure Multisite</span></a>
+  <button id="navToggle" class="ghost-button nav-toggle" type="button">Меню</button>
+  <nav class="nav">
+    <a class="nav__link" href="home.html">Главная</a>
+    <a class="nav__link" href="posts.html">Посты</a>
+    <a class="nav__link" href="team.html">Команда</a>
+    <a class="nav__link" href="workshop.html">Мастерская</a>
+    <a class="nav__link" href="about.html">О команде</a>
+    <a class="nav__link" href="settings.html">Настройки</a>
+  </nav>
+  <div class="topbar-actions">
+    <span id="userBadge" class="user-badge">User</span>
+    <button id="logoutButton" class="ghost-button" type="button">Выйти</button>
+  </div>
+</header>
+    <main>
+      <section class="page-title">
+        <div class="kicker">about dexxure</div>
+        <h1>О команде</h1>
+        <p>Информационный раздел для описания Dexxure Games. Оригинальные ссылки можно будет вставить позже в этот файл или вынести в Supabase.</p>
+      </section>
+      <section class="about-layout">
+        <article class="glass-card card-pad">
+          <h2>Dexxure Games</h2>
+          <p>Dexxure Games — независимая команда, занимающаяся разработкой видеоигр на Unity и Unreal Engine. Команда создаёт проекты разных жанров, экспериментирует с механиками и уделяет внимание атмосфере, геймплею и качеству исполнения.</p>
+        </article>
+        <article class="glass-card card-pad">
+          <h2>Что можно добавить дальше</h2>
+          <p>Ссылки на GitHub, itch.io, лаунчер, Discord, Telegram, страницы игр, правила мастерской и страницу заявок в команду.</p>
+          <div class="terminal-window">
+            <div class="terminal-window__bar"><span></span><span></span><span></span></div>
+            <pre>links.pending = true
+team.expansion = ready
+workshop.moderation = enabled</pre>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

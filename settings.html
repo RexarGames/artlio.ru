@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dexxure Multisite — настройки</title>
+  <link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+  <div class="site-shell">
+    <header class="topbar">
+  <a class="brand" href="home.html"><span class="logo-mark">DG</span><span>Dexxure Multisite</span></a>
+  <button id="navToggle" class="ghost-button nav-toggle" type="button">Меню</button>
+  <nav class="nav">
+    <a class="nav__link" href="home.html">Главная</a>
+    <a class="nav__link" href="posts.html">Посты</a>
+    <a class="nav__link" href="team.html">Команда</a>
+    <a class="nav__link" href="workshop.html">Мастерская</a>
+    <a class="nav__link" href="about.html">О команде</a>
+    <a class="nav__link" href="settings.html">Настройки</a>
+  </nav>
+  <div class="topbar-actions">
+    <span id="userBadge" class="user-badge">User</span>
+    <button id="logoutButton" class="ghost-button" type="button">Выйти</button>
+  </div>
+</header>
+    <main>
+      <section class="page-title">
+        <div class="kicker">user preferences</div>
+        <h1>Настройки</h1>
+        <p>Настройки сохраняются в Supabase и применяются при открытии страниц.</p>
+      </section>
+      <section class="settings-layout">
+        <article class="glass-card card-pad">
+          <h2>Профиль</h2>
+          <p id="settingsMessage" class="message-box">Измени параметры и нажми сохранить.</p>
+          <form id="settingsForm" class="form-grid">
+            <label class="form-field"><span>Ник</span><input name="nickname" type="text" required></label>
+            <label class="form-field"><span>Акцентный цвет</span><div class="color-row"><input name="accent_color" type="color"><span id="accentPreview" class="accent-preview"></span></div></label>
+            <label class="toggle-field"><span>Скан-линии</span><input name="scanlines" type="checkbox"></label>
+            <label class="toggle-field"><span>Меньше анимаций</span><input name="reduced_motion" type="checkbox"></label>
+            <label class="toggle-field"><span>Компактный режим</span><input name="compact_mode" type="checkbox"></label>
+            <button class="cyber-button" type="submit">Сохранить</button>
+          </form>
+        </article>
+        <article class="glass-card card-pad">
+          <h2>Отслеживание</h2>
+          <p>При входе, регистрации, открытии страниц, сохранении настроек и загрузке мода сайт отправляет событие в Supabase Edge Function. Функция сохраняет событие в таблицу <code>site_events</code> и отправляет уведомление в Telegram-бота админу.</p>
+        </article>
+      </section>
+    </main>
+  </div>
+  <script type="module" src="src/main.js"></script>
+  <script type="module" src="src/settings.js"></script>
+</body>
+</html>

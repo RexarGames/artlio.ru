@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dexxure Multisite — главная</title>
+  <link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+  <div class="site-shell">
+    <header class="topbar">
+  <a class="brand" href="home.html"><span class="logo-mark">DG</span><span>Dexxure Multisite</span></a>
+  <button id="navToggle" class="ghost-button nav-toggle" type="button">Меню</button>
+  <nav class="nav">
+    <a class="nav__link" href="home.html">Главная</a>
+    <a class="nav__link" href="posts.html">Посты</a>
+    <a class="nav__link" href="team.html">Команда</a>
+    <a class="nav__link" href="workshop.html">Мастерская</a>
+    <a class="nav__link" href="about.html">О команде</a>
+    <a class="nav__link" href="settings.html">Настройки</a>
+  </nav>
+  <div class="topbar-actions">
+    <span id="userBadge" class="user-badge">User</span>
+    <button id="logoutButton" class="ghost-button" type="button">Выйти</button>
+  </div>
+</header>
+
+    <main>
+      <section class="page-title">
+        <div class="kicker">protected multisite</div>
+        <h1>Dexxure Games Portal</h1>
+        <p>Закрытая главная страница портала: Telegram-посты, состав команды, мастерская модов и личные настройки пользователя.</p>
+      </section>
+
+      <section class="hero-grid">
+        <article class="glass-card card-pad">
+          <div class="kicker">core idea</div>
+          <h2>Один сайт для всей экосистемы</h2>
+          <p>Сайт разделён на отдельные страницы. Пользователь сначала проходит регистрацию или вход, а потом получает доступ к материалам Dexxure Games.</p>
+          <a class="cyber-button" href="workshop.html">Открыть мастерскую</a>
+        </article>
+        <article class="glass-card card-pad">
+          <div class="terminal-window">
+            <div class="terminal-window__bar"><span></span><span></span><span></span></div>
+            <pre>modules.ready = true
+supabase.auth = required
+telegram.tracking = edge_function
+style = acid_hacker</pre>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-head">
+        <div>
+          <h2>Статистика</h2>
+          <p>Данные подтягиваются из Supabase.</p>
+        </div>
+      </section>
+      <section class="stats-grid">
+        <article class="stat-card glass-card"><strong id="statPosts">0</strong><span>Telegram-постов в кэше</span></article>
+        <article class="stat-card glass-card"><strong id="statMods">0</strong><span>Одобренных модов</span></article>
+        <article class="stat-card glass-card"><strong id="statTeam">4</strong><span>Участника команды</span></article>
+      </section>
+
+      <section class="section-head">
+        <div>
+          <h2>Разделы</h2>
+          <p>Каждый блок вынесен на отдельную страницу.</p>
+        </div>
+      </section>
+      <section class="feature-grid">
+        <a class="glass-card card-pad" href="posts.html"><h3>Посты Telegram</h3><p>Кэш публикаций канала @DexxureEnt через Supabase.</p></a>
+        <a class="glass-card card-pad" href="team.html"><h3>Команда</h3><p>Состав Dexxure Games с ролями и описанием.</p></a>
+        <a class="glass-card card-pad" href="workshop.html"><h3>Мастерская</h3><p>Загрузка модов пользователями в Supabase Storage.</p></a>
+      </section>
+    </main>
+  </div>
+  <script type="module" src="src/main.js"></script>
+  <script type="module" src="src/home.js"></script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dexxure Multisite — вход</title>
+  <meta name="description" content="Вход и регистрация Dexxure Games Multisite.">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="src/styles.css">
+</head>
+<body class="auth-page">
+  <main class="auth-shell">
+    <section class="auth-hero">
+      <div>
+        <div class="logo-mark">DG</div>
+        <div class="kicker">Dexxure Games Multisite</div>
+        <h1>Access required</h1>
+        <p>
+          Единый портал Dexxure Games: новости, команда, мастерская модов,
+          настройки профиля и серверное отслеживание событий через Telegram-бота.
+        </p>
+      </div>
+      <div class="terminal-window">
+        <div class="terminal-window__bar"><span></span><span></span><span></span></div>
+        <pre>dexxure@multisite:~$ auth --required
+status: protected
+modules: posts / team / workshop / settings
+telegram: server-side tracking enabled</pre>
+      </div>
+    </section>
+
+    <section class="auth-panel">
+      <div class="auth-tabs">
+        <button type="button" class="is-active" data-auth-tab="login">Вход</button>
+        <button type="button" data-auth-tab="register">Регистрация</button>
+      </div>
+
+      <p id="authMessage" class="message-box">Войди, чтобы открыть Dexxure Multisite.</p>
+
+      <form id="loginForm" class="form-grid">
+        <label class="form-field">
+          <span>Email</span>
+          <input name="email" type="email" autocomplete="email" required placeholder="you@example.com">
+        </label>
+        <label class="form-field">
+          <span>Пароль</span>
+          <input name="password" type="password" autocomplete="current-password" required placeholder="Минимум 6 символов">
+        </label>
+        <button class="cyber-button" type="submit">Войти</button>
+      </form>
+
+      <form id="registerForm" class="form-grid" hidden>
+        <label class="form-field">
+          <span>Ник</span>
+          <input name="nickname" type="text" autocomplete="nickname" required placeholder="DexxureUser">
+        </label>
+        <label class="form-field">
+          <span>Email</span>
+          <input name="email" type="email" autocomplete="email" required placeholder="you@example.com">
+        </label>
+        <label class="form-field">
+          <span>Пароль</span>
+          <input name="password" type="password" autocomplete="new-password" required placeholder="Минимум 6 символов">
+        </label>
+        <button class="cyber-button" type="submit">Создать аккаунт</button>
+      </form>
+    </section>
+  </main>
+
+  <script type="module" src="src/auth.js"></script>
+</body>
+</html>
