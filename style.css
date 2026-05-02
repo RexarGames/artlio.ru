@@ -116,6 +116,7 @@ main {
   padding: 0 1rem 3rem;
 }
 
+/* Все секции скрыты по умолчанию, активная показывается */
 .section {
   display: none;
   animation: fadeIn 0.4s ease;
