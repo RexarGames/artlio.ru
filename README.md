@@ -1,161 +1,71 @@
-# Dexxure Multisite v2
+# Dexxure Games Portal v3
 
-Статический сайт для GitHub Pages + Supabase:
+Обновлённая версия сайта с отдельным входом и отдельной регистрацией.
 
-- обязательный вход/регистрация перед сайтом;
-- отдельные страницы: главная, посты, команда, мастерская, о команде, настройки;
-- Supabase Auth для аккаунтов;
-- Supabase Database для настроек, команды, постов, модов и событий;
-- Supabase Storage для файлов модов;
-- Edge Function `track-event` для отслеживания событий и уведомлений в Telegram;
-- Edge Function `sync-telegram-posts` для кэша постов канала `@DexxureEnt`.
+## Что изменено
 
-## 1. Важно про ключи
+- `index.html` теперь только вход.
+- `register.html` теперь отдельная регистрация.
+- Убрана функция автоматической синхронизации Telegram-постов.
+- Убраны тексты про Supabase из интерфейса сайта.
+- Мастерская принимает ссылку на мод, а не прямую загрузку файла.
+- Добавлена страница `games.html` со списком проектов по публичной странице itch.io.
+- Внизу страниц добавлено предупреждение о фейковых сайтах.
+- JS собран в `assets/app.min.js` в минифицированном виде.
 
-В `src/config.js` можно хранить только public/publishable key.
+## Что загрузить в GitHub Pages
 
-Secret key и Telegram bot token нельзя вставлять в `index.html`, `app.js`, `config.js` и нельзя коммитить в GitHub.
-
-Если токен бота или secret key уже был отправлен в чат или загружен в публичный репозиторий, перевыпусти его:
-
-- Telegram: BotFather → `/revoke` или пересоздать токен;
-- Supabase: Project Settings → API Keys → rotate/revoke secret key.
-
-## 2. Установка базы
-
-Открой Supabase → SQL Editor и выполни файл:
-
-```sql
-supabase/sql/schema.sql
-```
-
-## 3. Настройка Auth
-
-В Supabase включи email/password регистрацию:
-
-```txt
-Authentication → Providers → Email
-```
-
-Для теста удобнее отключить подтверждение почты:
-
-```txt
-Authentication → Providers → Email → Confirm email = OFF
-```
-
-Если подтверждение почты включено, после регистрации пользователь должен подтвердить email.
-
-## 4. Деплой сайта на GitHub Pages
-
-Залей в репозиторий:
+Загружай содержимое папки проекта в корень репозитория:
 
 ```txt
 index.html
+register.html
 home.html
+games.html
 posts.html
 team.html
 workshop.html
 about.html
 settings.html
-src/
-supabase/
-README.md
+assets/
 ```
 
-Потом:
+Папку `supabase/` можно не публиковать на GitHub Pages, если не хочешь показывать SQL и функцию.
+
+## Supabase SQL
+
+Выполни файл:
 
 ```txt
-GitHub → Settings → Pages → Deploy from branch → main → root
+supabase/sql/update-v3.sql
 ```
 
-## 5. Telegram-отслеживание через бота
-
-Сайт отправляет события в Edge Function `track-event`:
-
-- вход;
-- регистрация;
-- открытие страниц;
-- сохранение настроек;
-- загрузка мода;
-- выход.
-
-Функция сохраняет событие в таблицу `site_events` и отправляет сообщение админу в Telegram.
-
-Нужно узнать свой `TELEGRAM_ADMIN_CHAT_ID`:
-
-1. Напиши своему боту любое сообщение, например `/start`.
-2. Открой в браузере:
+Он добавляет новые поля для мастерской:
 
 ```txt
-https://api.telegram.org/botНОВЫЙ_ТОКЕН/getUpdates
+download_url
+preview_url
 ```
 
-3. Найди в ответе `chat.id`.
+## Telegram tracking
 
-Затем установи секреты Supabase:
+Оставлена только функция отслеживания событий:
 
-```bash
-supabase secrets set TELEGRAM_BOT_TOKEN="НОВЫЙ_ТОКЕН_БОТА"
-supabase secrets set TELEGRAM_ADMIN_CHAT_ID="ТВОЙ_CHAT_ID"
+```txt
+supabase/functions/track-event/index.ts
 ```
 
-Деплой функции:
+Secrets для неё:
 
-```bash
-supabase functions deploy track-event --no-verify-jwt
+```txt
+SUPABASE_URL=https://llihkhqbixjgvcltcajn.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=новый_service_role_key
+TELEGRAM_BOT_TOKEN=новый_токен_бота
+TELEGRAM_ADMIN_CHAT_ID=твой_chat_id
 ```
 
-`--no-verify-jwt` нужен потому, что функция сама проверяет JWT пользователя внутри кода через Supabase Auth.
+Старый токен бота и secret key лучше перевыпустить, потому что они были отправлены в чат.
 
-## 6. Синхронизация постов Telegram
+## Важное про защиту кода
 
-Установи секреты:
-
-```bash
-supabase secrets set TELEGRAM_CHANNEL="DexxureEnt"
-supabase secrets set SYNC_SECRET="любой_длинный_секрет"
-```
-
-Деплой функции:
-
-```bash
-supabase functions deploy sync-telegram-posts --no-verify-jwt
-```
-
-Ручной запуск:
-
-```bash
-curl -X POST "https://llihkhqbixjgvcltcajn.supabase.co/functions/v1/sync-telegram-posts" \
-  -H "x-sync-secret: любой_длинный_секрет"
-```
-
-После успешного запуска посты появятся в таблице `telegram_posts` и на странице `posts.html`.
-
-## 7. Модерация модов
-
-Новые моды создаются со статусом `pending`. Чтобы показать мод всем:
-
-```sql
-update public.mods
-set status = 'approved', updated_at = now()
-where id = 'ID_МОДА';
-```
-
-Чтобы отклонить:
-
-```sql
-update public.mods
-set status = 'rejected', updated_at = now()
-where id = 'ID_МОДА';
-```
-
-## 8. Состав команды
-
-Сейчас в SQL уже прописано:
-
-- Dexxure — Владелец;
-- Link — основной разработчик игр на Unity и Unreal Engine;
-- afryder — программист;
-- Jiterset — тестировщик игр.
-
-Редактировать можно в таблице `team_members`.
+Фронтенд-код на обычном сайте нельзя полностью скрыть: браузер всё равно должен скачать HTML, CSS и JS. В этой версии JS минифицирован, чтобы его было сложнее читать, но это не является настоящей защитой от копирования.

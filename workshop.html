@@ -3,53 +3,50 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Dexxure Multisite — мастерская</title>
-  <link rel="stylesheet" href="src/styles.css">
+  <title>Dexxure Games — мастерская</title>
+  <meta name="description" content="Мастерская модов Dexxure Games.">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="assets/style.css">
 </head>
-<body>
+<body data-page="workshop">
   <div class="site-shell">
     <header class="topbar">
-  <a class="brand" href="home.html"><span class="logo-mark">DG</span><span>Dexxure Multisite</span></a>
-  <button id="navToggle" class="ghost-button nav-toggle" type="button">Меню</button>
-  <nav class="nav">
-    <a class="nav__link" href="home.html">Главная</a>
-    <a class="nav__link" href="posts.html">Посты</a>
-    <a class="nav__link" href="team.html">Команда</a>
-    <a class="nav__link" href="workshop.html">Мастерская</a>
-    <a class="nav__link" href="about.html">О команде</a>
-    <a class="nav__link" href="settings.html">Настройки</a>
-  </nav>
-  <div class="topbar-actions">
-    <span id="userBadge" class="user-badge">User</span>
-    <button id="logoutButton" class="ghost-button" type="button">Выйти</button>
-  </div>
-</header>
+      <a class="brand" href="home.html"><span class="brand-mark">DG</span><span>Dexxure Games</span></a>
+      <button id="navToggle" class="menu-button" type="button">Меню</button>
+      <nav class="nav" aria-label="Навигация">
+        <a href="home.html">Главная</a><a href="games.html">Игры</a><a href="posts.html">Посты</a><a href="team.html">Команда</a><a href="workshop.html">Мастерская</a><a href="about.html">О команде</a><a href="settings.html">Настройки</a>
+      </nav>
+      <div class="account-line"><span id="userBadge">Profile</span><button id="logoutButton" type="button">Выйти</button></div>
+    </header>
     <main>
-      <section class="page-title">
-        <div class="kicker">mod workshop</div>
-        <h1>Мастерская</h1>
-        <p>Пользователи загружают моды к играм. Новые материалы получают статус <code>pending</code>, а после проверки становятся <code>approved</code>.</p>
+      <section class="page-title page-title--split">
+        <div>
+          <p class="eyebrow">Workshop</p>
+          <h1>Мастерская модов</h1>
+          <p>Здесь не загружаются файлы напрямую. Автор отправляет ссылку на архив или страницу мода, а команда проверяет заявку.</p>
+        </div>
       </section>
-      <section class="upload-layout">
-        <article class="glass-card card-pad">
-          <h2>Загрузить мод</h2>
-          <p id="uploadMessage" class="message-box">Выбери файл мода и заполни описание.</p>
-          <form id="uploadForm" class="form-grid">
-            <label class="form-field"><span>Название мода</span><input name="title" type="text" required placeholder="Название"></label>
-            <label class="form-field"><span>Игра</span><input name="game_title" type="text" required placeholder="Например: LUMI"></label>
-            <label class="form-field"><span>Описание</span><textarea name="description" rows="5" required placeholder="Что добавляет мод"></textarea></label>
-            <label class="form-field"><span>Файл</span><input name="file" type="file" required></label>
-            <button class="cyber-button" type="submit">Отправить на проверку</button>
-          </form>
-        </article>
+
+      <section class="split-layout">
+        <form id="modForm" class="form-card">
+          <h2>Отправить мод</h2>
+          <p>Ссылка должна вести на файл, страницу скачивания или облако с доступом.</p>
+          <p id="uploadMessage" class="message-box" hidden></p>
+          <label class="field"><span>Название мода</span><input name="title" required placeholder="Название"></label>
+          <label class="field"><span>Для какой игры</span><input name="game_title" required placeholder="Например: Gore's Mod"></label>
+          <label class="field"><span>Ссылка на мод</span><input name="download_url" type="url" required placeholder="https://..."></label>
+          <label class="field"><span>Ссылка на превью, если есть</span><input name="preview_url" type="url" placeholder="https://..."></label>
+          <label class="field"><span>Описание</span><textarea name="description" required rows="5" placeholder="Что добавляет мод, версия, особенности"></textarea></label>
+          <button class="primary-button" type="submit">Отправить на проверку</button>
+        </form>
         <section>
-          <div class="section-head" style="margin-top: 0"><div><h2>Моды</h2><p>Показываются одобренные моды и твои собственные загрузки.</p></div></div>
-          <div id="modsGrid" class="mods-grid"></div>
+          <div class="section-head section-head--tight"><div><p class="eyebrow">Approved / pending</p><h2>Список модов</h2></div></div>
+          <div id="modsGrid" class="cards-grid cards-grid--compact"></div>
         </section>
       </section>
     </main>
+    <footer class="site-footer">В сети могут появляться фейковые сайты и копии Dexxure Games. Проверяйте адрес, ссылки и не скачивайте файлы из подозрительных источников.</footer>
   </div>
-  <script type="module" src="src/main.js"></script>
-  <script type="module" src="src/workshop.js"></script>
+  <script type="module" src="assets/app.min.js"></script>
 </body>
 </html>

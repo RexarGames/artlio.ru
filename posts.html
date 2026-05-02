@@ -3,41 +3,34 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Dexxure Multisite — посты</title>
-  <link rel="stylesheet" href="src/styles.css">
+  <title>Dexxure Games — посты</title>
+  <meta name="description" content="Посты Dexxure Games из Telegram.">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="assets/style.css">
 </head>
-<body>
+<body data-page="posts">
   <div class="site-shell">
     <header class="topbar">
-  <a class="brand" href="home.html"><span class="logo-mark">DG</span><span>Dexxure Multisite</span></a>
-  <button id="navToggle" class="ghost-button nav-toggle" type="button">Меню</button>
-  <nav class="nav">
-    <a class="nav__link" href="home.html">Главная</a>
-    <a class="nav__link" href="posts.html">Посты</a>
-    <a class="nav__link" href="team.html">Команда</a>
-    <a class="nav__link" href="workshop.html">Мастерская</a>
-    <a class="nav__link" href="about.html">О команде</a>
-    <a class="nav__link" href="settings.html">Настройки</a>
-  </nav>
-  <div class="topbar-actions">
-    <span id="userBadge" class="user-badge">User</span>
-    <button id="logoutButton" class="ghost-button" type="button">Выйти</button>
-  </div>
-</header>
+      <a class="brand" href="home.html"><span class="brand-mark">DG</span><span>Dexxure Games</span></a>
+      <button id="navToggle" class="menu-button" type="button">Меню</button>
+      <nav class="nav" aria-label="Навигация">
+        <a href="home.html">Главная</a><a href="games.html">Игры</a><a href="posts.html">Посты</a><a href="team.html">Команда</a><a href="workshop.html">Мастерская</a><a href="about.html">О команде</a><a href="settings.html">Настройки</a>
+      </nav>
+      <div class="account-line"><span id="userBadge">Profile</span><button id="logoutButton" type="button">Выйти</button></div>
+    </header>
     <main>
-      <section class="page-title">
-        <div class="kicker">telegram feed</div>
-        <h1>Посты DexxureEnt</h1>
-        <p>Сайт читает публикации из таблицы Supabase. Таблица обновляется Edge Function, чтобы не парсить Telegram напрямую в браузере.</p>
-        <a id="openChannel" class="cyber-button" href="#" target="_blank" rel="noreferrer">Открыть канал</a>
+      <section class="page-title page-title--split">
+        <div>
+          <p class="eyebrow">Telegram</p>
+          <h1>Публикации команды</h1>
+          <p>Раздел показывает сохранённые публикации и даёт быстрый переход в официальный канал.</p>
+        </div>
+        <a id="openChannel" class="primary-button" href="https://t.me/DexxureEnt" target="_blank" rel="noreferrer">Открыть канал</a>
       </section>
-      <section class="section-head">
-        <div><h2>Лента</h2><p id="refreshInfo">Кэш постов загружается...</p></div>
-      </section>
-      <section id="postsGrid" class="posts-grid"></section>
+      <section id="postsGrid" class="cards-grid"></section>
     </main>
+    <footer class="site-footer">В сети могут появляться фейковые сайты и копии Dexxure Games. Проверяйте адрес, ссылки и не скачивайте файлы из подозрительных источников.</footer>
   </div>
-  <script type="module" src="src/main.js"></script>
-  <script type="module" src="src/posts.js"></script>
+  <script type="module" src="assets/app.min.js"></script>
 </body>
 </html>
