@@ -1,7 +1,7 @@
-// Единственный URL — никаких ключей
+// Без ключей, только URL функции
 const API_URL = "https://llihkhqbixjgvcltcajn.supabase.co/functions/v1/api";
 
-// Универсальная функция запроса
+// Универсальный запрос
 async function api(action, payload = {}) {
   const resp = await fetch(API_URL, {
     method: "POST",
@@ -11,7 +11,52 @@ async function api(action, payload = {}) {
   return resp.json();
 }
 
-// Матричный фон
+// ----- Аутентификация -----
+const AUTH_KEY = "dexxure_auth_token";
+
+function getToken() {
+  return localStorage.getItem(AUTH_KEY);
+}
+
+function setToken(token) {
+  localStorage.setItem(AUTH_KEY, token);
+}
+
+function clearToken() {
+  localStorage.removeItem(AUTH_KEY);
+}
+
+let currentUser = null;
+
+async function checkAuth() {
+  const token = getToken();
+  if (!token) return false;
+
+  const { ok, data } = await api("getUser", { token });
+  if (ok && data) {
+    currentUser = data;
+    return true;
+  } else {
+    clearToken();
+    return false;
+  }
+}
+
+// ----- Сохранение настроек (с токеном) -----
+async function loadSettings() {
+  const token = getToken();
+  const response = await api("loadSettings", { token });
+  if (response.ok) return response.data || { theme: "cyber", volume: 0.8 };
+  return { theme: "cyber", volume: 0.8 };
+}
+
+async function saveSettings(theme, volume) {
+  const token = getToken();
+  const response = await api("saveSettings", { token, theme, volume });
+  return response.ok;
+}
+
+// ----- Матричный фон -----
 const canvas = document.getElementById("matrix");
 const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
@@ -32,35 +77,77 @@ function drawMatrix() {
 }
 setInterval(drawMatrix, 50);
 
-// Генерация/получение ID пользователя
-function getUserId() {
-  let id = localStorage.getItem("dexxure_user_id");
-  if (!id) {
-    id = crypto.randomUUID();
-    localStorage.setItem("dexxure_user_id", id);
-  }
-  return id;
+// ----- Интерфейс -----
+const main = document.getElementById("app");
+const nav = document.querySelector("nav");
+
+// Скрываем навигацию до входа
+nav.style.display = "none";
+
+// Форма авторизации (показывается первой)
+function showAuthForm(mode = "signin") {
+  main.innerHTML = `
+    <div class="auth-form">
+      <h2 class="glitch" data-text="${mode === 'signin' ? 'ВХОД' : 'РЕГИСТРАЦИЯ'}">${mode === 'signin' ? 'ВХОД' : 'РЕГИСТРАЦИЯ'}</h2>
+      <form id="auth-form">
+        <input type="email" id="auth-email" placeholder="Email" required>
+        <input type="password" id="auth-password" placeholder="Пароль" required minlength="6">
+        <button type="submit">${mode === 'signin' ? 'Войти' : 'Зарегистрироваться'}</button>
+      </form>
+      <p id="auth-switch">
+        ${mode === 'signin'
+          ? 'Нет аккаунта? <a href="#" id="switch-to-signup">Регистрация</a>'
+          : 'Есть аккаунт? <a href="#" id="switch-to-signin">Войти</a>'}
+      </p>
+      <p id="auth-error" style="color: red;"></p>
+    </div>
+  `;
+
+  document.getElementById("auth-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("auth-email").value;
+    const password = document.getElementById("auth-password").value;
+    const action = mode === "signin" ? "signin" : "signup";
+    const { ok, data, error } = await api(action, { email, password });
+
+    if (ok) {
+      if (mode === "signup") {
+        // После регистрации сразу входим (т.к. signUp не всегда возвращает session)
+        const signinRes = await api("signin", { email, password });
+        if (signinRes.ok) {
+          setToken(signinRes.data.session.access_token);
+          initApp();
+        } else {
+          document.getElementById("auth-error").textContent = "Регистрация прошла, но войти не удалось. Попробуйте войти вручную.";
+        }
+      } else {
+        setToken(data.session.access_token);
+        initApp();
+      }
+    } else {
+      document.getElementById("auth-error").textContent = error || "Ошибка";
+    }
+  });
+
+  document.getElementById("switch-to-signup")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    showAuthForm("signup");
+  });
+  document.getElementById("switch-to-signin")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    showAuthForm("signin");
+  });
 }
 
-// Загрузка настроек через API
-async function loadSettings() {
-  const userId = getUserId();
-  const response = await api("loadSettings", { user_id: userId });
-  if (response.ok) return response.data || { theme: "cyber", volume: 0.8 };
-  console.error("Ошибка загрузки настроек:", response.error);
-  return { theme: "cyber", volume: 0.8 };
-}
-
-// Сохранение настроек
-async function saveSettings(theme, volume) {
-  const userId = getUserId();
-  const response = await api("saveSettings", { user_id: userId, theme, volume });
-  return response.ok;
+// Инициализация основного интерфейса после входа
+async function initApp() {
+  nav.style.display = "flex";
+  const initialSection = location.hash.slice(1) || "posts";
+  showSection(initialSection);
 }
 
 // Навигация
 const navLinks = document.querySelectorAll(".nav-link");
-const main = document.getElementById("app");
 
 function showSection(sectionId) {
   main.innerHTML = "";
@@ -92,10 +179,7 @@ window.addEventListener("popstate", () => {
   showSection(section);
 });
 
-const initialSection = location.hash.slice(1) || "posts";
-showSection(initialSection);
-
-// Шаблоны секций
+// Шаблоны (обновлённый tmpl-about и остальные)
 const templates = `
   <template id="tmpl-posts">
     <div class="section active">
@@ -136,9 +220,14 @@ const templates = `
   <template id="tmpl-about">
     <div class="section">
       <h2 class="glitch" data-text="ИНФОРМАЦИЯ">ИНФОРМАЦИЯ</h2>
-      <p>Dexxure Games — независимая команда разработчиков игр и модов.</p>
-      <p>Контакты: t.me/DexxureEnt</p>
-      <p>Подробнее будет на artlio.ru (ссылки скинешь).</p>
+      <p>Dexxure Games © 2023-2026 DEXXURE GAMES. Все права защищены.</p>
+      <p>DEXXURE Games™ — независимая игровая команда, занимающаяся разработкой видеоигр на движках Unity. Мы создаём проекты разных жанров, экспериментируем с механиками и уделяем особое внимание атмосфере, геймплею и качеству исполнения.</p>
+      <p>У DEXXURE Games есть собственный игровой Launcher — DG Launcher, в котором будет собрана большая часть наших текущих и будущих проектов. Это единая платформа для удобного доступа к нашим играм, обновлениям и новостям.</p>
+      <p>Мы активно развиваем своё сообщество:</p>
+      <ul>
+        <li>ведём собственный канал, где делимся прогрессом разработки, анонсами и закулисьем создания игр;</li>
+      </ul>
+      <p>DEXXURE Games™ — это развитие, идеи и постоянное движение вперёд. Мы делаем игры, в которые хотим играть сами.</p>
     </div>
   </template>
 
@@ -147,7 +236,7 @@ const templates = `
       <h2 class="glitch" data-text="НАСТРОЙКИ">НАСТРОЙКИ</h2>
       <form id="settings-form" class="settings-form">
         <label>
-          Тема (не используется):
+          Тема (в разработке):
           <select id="theme-select">
             <option value="cyber">Cyber</option>
             <option value="acid">Acid</option>
@@ -162,6 +251,7 @@ const templates = `
         <button type="submit">Сохранить настройки</button>
       </form>
       <p id="settings-status"></p>
+      <button id="logout-btn" style="margin-top:1rem; background: #330000;">Выйти</button>
     </div>
   </template>
 `;
@@ -179,7 +269,7 @@ async function loadPosts() {
     return;
   }
   if (data.length === 0) {
-    container.innerHTML = "Постов пока нет. Они появятся после первого запуска Edge Function.";
+    container.innerHTML = "Постов пока нет. Они появятся после первого запуска парсинга Telegram.";
     return;
   }
   container.innerHTML = data
@@ -230,11 +320,29 @@ async function initSettings() {
       const volume = parseFloat(volumeRange.value);
       const success = await saveSettings(theme, volume);
       if (status) {
-        status.textContent = success
-          ? "Настройки сохранены."
-          : "Ошибка сохранения.";
+        status.textContent = success ? "Настройки сохранены." : "Ошибка сохранения.";
         status.style.color = success ? "var(--acid)" : "red";
       }
     });
   }
+
+  // Кнопка выхода
+  document.getElementById("logout-btn")?.addEventListener("click", async () => {
+    const token = getToken();
+    await api("signout", { token });
+    clearToken();
+    currentUser = null;
+    nav.style.display = "none";
+    showAuthForm("signin");
+  });
 }
+
+// Старт приложения
+(async () => {
+  const isLogged = await checkAuth();
+  if (isLogged) {
+    await initApp();
+  } else {
+    showAuthForm("signin");
+  }
+})();
