@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#05080f" />
+    <meta name="description" content="Dexxure Games multisite: новости, команда, мастерская модов и информация о проектах." />
+    <title>Dexxure Games — Multisite</title>
+    <link rel="preconnect" href="https://esm.sh" />
+    <link rel="stylesheet" href="src/styles.css" />
+  </head>
+  <body>
+    <div class="noise" aria-hidden="true"></div>
+    <div class="grid-bg" aria-hidden="true"></div>
+    <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <a class="brand" href="#home" aria-label="Dexxure Games home">
+        <span class="brand-mark">DG</span>
+        <span>
+          <strong>Dexxure Games</strong>
+          <small>multisite terminal</small>
+        </span>
+      </a>
+
+      <button class="nav-toggle" id="navToggle" type="button" aria-label="Открыть меню">
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav class="nav" id="nav">
+        <a href="#home" data-route="home">Главная</a>
+        <a href="#telegram" data-route="telegram">Telegram</a>
+        <a href="#team" data-route="team">Команда</a>
+        <a href="#workshop" data-route="workshop">Мастерская</a>
+        <a href="#about" data-route="about">О команде</a>
+        <a href="#settings" data-route="settings">Настройки</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero section" id="home" data-page>
+        <div class="hero-content reveal">
+          <p class="eyebrow">/ dexxure.games.network</p>
+          <h1>Единый хаб для проектов, команды и модов Dexxure Games</h1>
+          <p class="hero-text">
+            Мультисайт в кислотном техно-стиле: новости из Telegram-канала, состав команды,
+            мастерская модов, ссылки на проекты и сохранение настроек через Supabase.
+          </p>
+          <div class="hero-actions">
+            <a class="btn primary" href="#workshop">Открыть мастерскую</a>
+            <a class="btn ghost" href="#telegram">Последние посты</a>
+          </div>
+          <div class="terminal-card" role="status">
+            <div class="terminal-head">
+              <span></span><span></span><span></span>
+              <b>system.boot</b>
+            </div>
+            <pre id="bootLog">init multisite...
+loading supabase client...
+checking visitor profile...</pre>
+          </div>
+        </div>
+
+        <aside class="hero-panel reveal delay-1">
+          <div class="signal-ring"></div>
+          <div class="panel-stat">
+            <span>NETWORK</span>
+            <strong>ONLINE</strong>
+          </div>
+          <div class="panel-stat">
+            <span>CHANNEL</span>
+            <strong>@DexxureEnt</strong>
+          </div>
+          <div class="panel-stat">
+            <span>WORKSHOP</span>
+            <strong id="modsCount">0 MODS</strong>
+          </div>
+          <div class="panel-stat">
+            <span>PROFILE</span>
+            <strong id="profileState">GUEST</strong>
+          </div>
+        </aside>
+      </section>
+
+      <section class="section" id="telegram" data-page>
+        <div class="section-head reveal">
+          <p class="eyebrow">/ telegram.feed</p>
+          <h2>Посты из канала @DexxureEnt</h2>
+          <p>Посты берутся из таблицы Supabase. Обновление выполняет Edge Function, чтобы сайт на GitHub Pages не зависел от CORS Telegram.</p>
+        </div>
+        <div class="feed-grid" id="telegramFeed"></div>
+      </section>
+
+      <section class="section" id="team" data-page>
+        <div class="section-head reveal">
+          <p class="eyebrow">/ team.registry</p>
+          <h2>Команда и состав</h2>
+          <p>Карточки можно менять в таблице <code>team_members</code>. Пока стоят аккуратные заглушки под будущие реальные данные.</p>
+        </div>
+        <div class="team-grid" id="teamGrid"></div>
+      </section>
+
+      <section class="section" id="workshop" data-page>
+        <div class="section-head reveal">
+          <p class="eyebrow">/ mods.workshop</p>
+          <h2>Мастерская модов</h2>
+          <p>Пользователь может загрузить мод к игре. Файл уходит в Supabase Storage, а запись появляется в базе со статусом ожидания проверки.</p>
+        </div>
+
+        <div class="workshop-layout">
+          <form class="upload-card reveal" id="modForm">
+            <h3>Загрузить мод</h3>
+            <label>
+              Название мода
+              <input name="title" required maxlength="80" placeholder="Например: Dark UI Pack" />
+            </label>
+            <label>
+              Игра
+              <input name="game_title" required maxlength="80" placeholder="Например: LUMI" />
+            </label>
+            <label>
+              Версия
+              <input name="version" maxlength="24" placeholder="v1.0.0" />
+            </label>
+            <label>
+              Автор
+              <input name="author" maxlength="50" placeholder="Ваш ник" />
+            </label>
+            <label>
+              Описание
+              <textarea name="description" required maxlength="600" placeholder="Что добавляет мод, как установить, какие есть особенности"></textarea>
+            </label>
+            <label class="file-zone" id="fileZone">
+              <input name="file" type="file" required accept=".zip,.rar,.7z,.pak,.unitypackage,.txt,.json" />
+              <span>Перетащите файл или выберите вручную</span>
+              <small>Рекомендуется ZIP/7Z. Ограничение на фронтенде: 100 МБ.</small>
+            </label>
+            <button class="btn primary" type="submit">Отправить на проверку</button>
+            <p class="form-status" id="formStatus"></p>
+          </form>
+
+          <div class="mods-area reveal delay-1">
+            <div class="toolbar">
+              <input id="modSearch" placeholder="Поиск по модам" />
+              <select id="gameFilter" aria-label="Фильтр по игре">
+                <option value="all">Все игры</option>
+              </select>
+            </div>
+            <div class="mods-grid" id="modsGrid"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="about" data-page>
+        <div class="section-head reveal">
+          <p class="eyebrow">/ about.dexxure</p>
+          <h2>Информация о команде</h2>
+          <p>Здесь можно поставить оригинальные ссылки, описание, правила мастерской и список проектов.</p>
+        </div>
+        <div class="about-grid">
+          <article class="glass-card reveal">
+            <h3>Dexxure Games</h3>
+            <p>
+              Независимая игровая команда, занимающаяся разработкой видеоигр на Unity.
+              Команда экспериментирует с механиками, атмосферой, интерфейсами и качеством исполнения.
+            </p>
+          </article>
+          <article class="glass-card reveal delay-1">
+            <h3>Что будет на сайте</h3>
+            <ul>
+              <li>официальные новости и посты;</li>
+              <li>страницы проектов и лаунчера;</li>
+              <li>мастерская модов;</li>
+              <li>состав команды;</li>
+              <li>ссылки на itch.io, GitHub, Telegram и другие платформы.</li>
+            </ul>
+          </article>
+          <article class="glass-card reveal delay-2">
+            <h3>Правила мастерской</h3>
+            <p>
+              Загружайте только свои файлы или файлы, на которые у вас есть разрешение.
+              Не загружайте вредоносные архивы, чужие сборки и запрещённый контент.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="settings" data-page>
+        <div class="section-head reveal">
+          <p class="eyebrow">/ user.preferences</p>
+          <h2>Настройки посетителя</h2>
+          <p>Эти параметры сохраняются в Supabase для анонимного пользователя и дополнительно дублируются локально в браузере.</p>
+        </div>
+        <form class="settings-card reveal" id="settingsForm">
+          <label>
+            Ник на сайте
+            <input name="nickname" maxlength="32" placeholder="Например: Timur" />
+          </label>
+          <label>
+            Акцентный цвет
+            <select name="accent">
+              <option value="acid">Кислотный зелёный</option>
+              <option value="violet">Фиолетовый неон</option>
+              <option value="cyan">Кибер-голубой</option>
+              <option value="red">Красный тревожный</option>
+            </select>
+          </label>
+          <label class="switch-row">
+            <span>
+              <b>Скан-линии</b>
+              <small>Эффект старого терминала поверх сайта</small>
+            </span>
+            <input name="scanlines" type="checkbox" />
+          </label>
+          <label class="switch-row">
+            <span>
+              <b>Меньше анимаций</b>
+              <small>Отключает часть движения и свечения</small>
+            </span>
+            <input name="reduced_motion" type="checkbox" />
+          </label>
+          <label class="switch-row">
+            <span>
+              <b>Компактный режим</b>
+              <small>Карточки становятся плотнее</small>
+            </span>
+            <input name="compact_mode" type="checkbox" />
+          </label>
+          <button class="btn primary" type="submit">Сохранить настройки</button>
+          <p class="form-status" id="settingsStatus"></p>
+        </form>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="src/app.js"></script>
+  </body>
+</html>
