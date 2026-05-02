@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dexxure Games — главная</title>
+  <meta name="description" content="Главная страница портала Dexxure Games.">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-page="home">
+  <div class="site-shell">
+    <header class="topbar">
+      <a class="brand" href="../home/"><span class="brand-mark">DG</span><span>Dexxure Games</span></a>
+      <button id="navToggle" class="menu-button" type="button">Меню</button>
+      <nav class="nav" aria-label="Навигация">
+        <a href="../home/">Главная</a>
+        <a href="../games/">Игры</a>
+        <a href="../posts/">Посты</a>
+        <a href="../team/">Команда</a>
+        <a href="../workshop/">Мастерская</a>
+        <a href="../about/">О команде</a>
+        <a href="../settings/">Настройки</a>
+      </nav>
+      <div class="account-line"><span id="userBadge">Profile</span><button id="logoutButton" type="button">Выйти</button></div>
+    </header>
+
+    <main>
+      <section class="hero-section">
+        <div class="hero-section__content">
+          <p class="eyebrow">Dexxure Games Portal</p>
+          <h1>Единая точка для проектов, команды и мастерской</h1>
+          <div class="hero-actions">
+            <a class="primary-button" href="../games/">Смотреть проекты</a>
+            <a class="secondary-button" href="../workshop/">Открыть мастерскую</a>
+          </div>
+        </div>
+        <div class="hero-panel">
+          <p class="panel-label">Current index</p>
+          <strong>10 игр</strong>
+          <span>11 проектов вместе с DG Launcher</span>
+        </div>
+      </section>
+
+      <section class="stats-row" aria-label="Статистика портала">
+        <article><strong id="statGames">10</strong><span>игр на itch.io</span></article>
+        <article><strong id="statProjects">11</strong><span>проектов всего</span></article>
+        <article><strong id="statTeam">4</strong><span>участника команды</span></article>
+        <article><strong id="statMods">0</strong><span>модов в мастерской</span></article>
+      </section>
+
+      <section class="section-head">
+        <div>
+          <p class="eyebrow">Sections</p>
+          <h2>Разделы сайта</h2>
+        </div>
+      </section>
+
+      <section class="bento-grid">
+        <a class="bento-card bento-card--wide" href="../games/"><span>01</span><h3>Игры и проекты</h3><p>Каталог проектов Dexxure Games с поиском по названиям и категориям.</p></a>
+        <a class="bento-card" href="../posts/"><span>02</span><h3>Посты</h3><p>Переход к каналу и витрина последних публикаций, если они добавлены в базу.</p></a>
+        <a class="bento-card" href="../team/"><span>03</span><h3>Команда</h3><p>Роли участников и структура команды.</p></a>
+        <a class="bento-card bento-card--wide" href="../workshop/"><span>04</span><h3>Мастерская</h3><p>Пользователь отправляет ссылку на мод. После проверки он появляется в списке.</p></a>
+      </section>
+    </main>
+    <footer class="site-footer">В сети могут появляться фейковые сайты и копии Dexxure Games. Проверяйте адрес, ссылки и не скачивайте файлы из подозрительных источников.</footer>
+  </div>
+  <script type="module" src="../assets/app.min.js"></script>
+</body>
+</html>

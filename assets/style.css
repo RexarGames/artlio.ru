@@ -17,6 +17,10 @@
 }
 
 * { box-sizing: border-box; }
+html, body { max-width: 100%; }
+img, video { max-width: 100%; height: auto; }
+h1, h2, h3, p, a, span, strong { overflow-wrap: anywhere; }
+.hero-section__content, .page-title, .toolbar-card, .content-card, .form-card, .game-card, .post-card, .team-card, .mod-card, .bento-card { min-width: 0; }
 [hidden] { display: none !important; }
 
 html { scroll-behavior: smooth; }
@@ -326,4 +330,250 @@ button { cursor: pointer; }
   .page-title--split, .toolbar-card { flex-direction: column; align-items: stretch; }
   .stats-row, .cards-grid, .team-grid, .bento-grid { grid-template-columns: 1fr; }
   .bento-card--wide { grid-column: auto; }
+}
+
+
+/* ===== Mobile and layout fix v4 ===== */
+.topbar { position: sticky; isolation: isolate; }
+.brand span:last-child { white-space: nowrap; }
+.nav a { white-space: nowrap; }
+.hero-section__content { max-width: 100%; }
+.hero-section .lead { max-width: 720px; }
+
+@media (max-width: 1180px) {
+  .topbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .brand { min-width: 0; }
+  .brand span:last-child {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .menu-button {
+    display: inline-flex;
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .nav {
+    display: none;
+    grid-column: 1 / -1;
+    width: 100%;
+    margin-left: 0;
+    padding: 10px;
+    border: 1px solid var(--line-soft);
+    border-radius: 18px;
+    background: rgba(6, 10, 8, 0.94);
+    box-shadow: 0 18px 42px rgba(0,0,0,.34);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+
+  .nav.is-open { display: flex; }
+  .nav a {
+    width: 100%;
+    padding: 14px 16px;
+    text-align: left;
+  }
+
+  .account-line {
+    grid-column: 1 / -1;
+    width: 100%;
+    justify-content: space-between;
+    margin-left: 0;
+    padding-top: 10px;
+    border-top: 1px solid var(--line-soft);
+  }
+
+  .account-line span { max-width: calc(100vw - 145px); }
+
+  .hero-section,
+  .split-layout,
+  .auth-layout,
+  .auth-layout--reverse {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-section {
+    min-height: auto;
+    align-items: start;
+    padding: 70px 0 44px;
+  }
+
+  .hero-panel { max-width: 520px; }
+  .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .team-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 780px) {
+  body {
+    background:
+      radial-gradient(circle at 16% 0%, rgba(183, 255, 0, 0.10), transparent 34%),
+      radial-gradient(circle at 84% 10%, rgba(28, 246, 196, 0.10), transparent 30%),
+      linear-gradient(180deg, #06110d 0%, var(--bg) 58%, #030403 100%);
+  }
+
+  body::before { background-size: 42px 42px; opacity: .65; }
+
+  .site-shell {
+    width: min(100% - 20px, 1220px);
+    padding: 10px 0 30px;
+  }
+
+  .topbar {
+    top: 8px;
+    min-height: 0;
+    padding: 10px;
+    border-radius: 18px;
+  }
+
+  .brand-mark {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+  }
+
+  .brand span:last-child { font-size: 15px; }
+
+  .hero-section {
+    padding: 42px 0 28px;
+    gap: 18px;
+  }
+
+  .hero-section h1,
+  .page-title h1,
+  .auth-copy h1 {
+    font-size: clamp(34px, 12vw, 48px);
+    line-height: 1.02;
+    letter-spacing: -0.045em;
+  }
+
+  .lead,
+  .page-title p:not(.eyebrow),
+  .content-card p,
+  .form-card p {
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  .hero-actions,
+  .auth-switch {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .primary-button,
+  .secondary-button,
+  .menu-button,
+  .account-line button {
+    width: 100%;
+  }
+
+  .hero-panel,
+  .stats-row article,
+  .mini-stat,
+  .bento-card,
+  .game-card,
+  .post-card,
+  .mod-card,
+  .team-card,
+  .form-card,
+  .content-card,
+  .toolbar-card,
+  .auth-card,
+  .auth-copy {
+    border-radius: 20px;
+  }
+
+  .hero-panel { padding: 22px; }
+  .hero-panel strong { font-size: clamp(48px, 18vw, 70px); }
+
+  .stats-row,
+  .cards-grid,
+  .team-grid,
+  .bento-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .bento-card--wide { grid-column: auto; }
+
+  .section-head,
+  .page-title--split,
+  .toolbar-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .section-head { margin: 30px 0 14px; }
+  .page-title { padding: 44px 0 24px; }
+
+  .toolbar-card { padding: 18px; }
+  .field--search input { min-width: 0; }
+
+  .form-card,
+  .content-card,
+  .bento-card,
+  .game-card,
+  .post-card,
+  .team-card,
+  .mod-card {
+    padding: 20px;
+    min-height: auto;
+  }
+
+  .auth-screen {
+    min-height: 100svh;
+    padding: 12px;
+    display: block;
+  }
+
+  .auth-layout,
+  .auth-layout--reverse {
+    width: 100%;
+    gap: 14px;
+  }
+
+  .auth-copy {
+    min-height: auto;
+    padding: 24px;
+  }
+
+  .brand--large {
+    position: static;
+    margin-bottom: 42px;
+  }
+
+  .auth-note { margin-top: 20px; }
+  .auth-card { padding: 22px; }
+  .auth-card__head h2 { font-size: 28px; }
+
+  .site-footer {
+    margin-top: 36px;
+    padding-top: 18px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 420px) {
+  .site-shell { width: min(100% - 14px, 1220px); }
+  .topbar { border-radius: 16px; }
+  .brand { gap: 8px; }
+  .brand-mark { width: 34px; height: 34px; font-size: 13px; }
+  .brand span:last-child { font-size: 14px; }
+  .hero-section h1,
+  .page-title h1,
+  .auth-copy h1 { font-size: 34px; }
+  .stats-row strong, .mini-stat strong { font-size: 34px; }
+  .bento-card h3, .game-card h3, .post-card h3, .team-card h3, .mod-card h3 { font-size: 21px; }
+  .field input, .field textarea { padding: 14px; border-radius: 14px; }
+  .account-line { align-items: stretch; flex-direction: column; }
+  .account-line span { max-width: 100%; }
 }
