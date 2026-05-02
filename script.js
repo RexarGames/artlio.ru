@@ -33,21 +33,6 @@ async function checkAuth() {
   return false;
 }
 
-// ---------- Settings ----------
-async function loadSettings() {
-  const token = getToken();
-  const { ok, data } = await api("loadSettings", { token });
-  return (ok && data) ? data : { theme: "cyber", volume: 0.8, avatar_url: null };
-}
-
-async function saveSettings(theme, volume, avatar_url = undefined) {
-  const token = getToken();
-  const payload = { token, theme, volume };
-  if (avatar_url !== undefined) payload.avatar_url = avatar_url;
-  const { ok } = await api("saveSettings", payload);
-  return ok;
-}
-
 // ---------- Matrix ----------
 const canvas = document.getElementById("matrix");
 const ctx = canvas.getContext("2d");
@@ -57,7 +42,7 @@ const chars = "01ガフカケコサシスセゾタダチヂツテデトドZYXWVU
 const drops = Array(Math.floor(canvas.width / 20)).fill(1);
 function drawMatrix() {
   ctx.fillStyle = "rgba(10,10,10,0.1)";
-  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = "#0f0";
   ctx.font = "15px monospace";
   for (let i = 0; i < drops.length; i++) {
@@ -69,13 +54,52 @@ function drawMatrix() {
 }
 setInterval(drawMatrix, 50);
 
-// ---------- Шаблоны сразу ----------
+// ---------- Templates ----------
 const templatesHTML = `
-  <template id="tmpl-posts"><div class="section active"><div id="posts-container">Загрузка постов...</div></div></template>
-  <template id="tmpl-team"><div class="section"><h2 class="glitch" data-text="НАША КОМАНДА">НАША КОМАНДА</h2><div class="team-member"><strong>Босс</strong> – @Dexxure<p>Основатель, главный идеолог.</p></div><div class="team-member"><strong>Разработчик</strong> – @code_ghost<p>Пишет код, оптимизирует баги.</p></div><p style="margin-top:1rem;">Полный состав появится позже, когда будут ссылки.</p></div></template>
-  <template id="tmpl-workshop"><div class="section"><h2 class="glitch" data-text="МАСТЕРСКАЯ">МАСТЕРСКАЯ</h2><p>Загружай свои моды для игр Dexxure Games.</p><form id="upload-mod-form" class="upload-form"><input type="text" id="mod-name" placeholder="Название мода" required><textarea id="mod-desc" placeholder="Описание" rows="3"></textarea><input type="file" id="mod-file" required><button type="submit">Загрузить</button></form><div id="mods-list"></div><p class="small" style="margin-top:1rem;">Функция в стадии тестирования.</p></div></template>
-  <template id="tmpl-about"><div class="section"><h2 class="glitch" data-text="ИНФОРМАЦИЯ">ИНФОРМАЦИЯ</h2><p><strong>Dexxure Games &copy; 2023-2026 DEXXURE GAMES. Все права защищены.</strong></p><p>DEXXURE Games™ — независимая игровая команда, занимающаяся разработкой видеоигр на движках Unity. Мы создаём проекты разных жанров, экспериментируем с механиками и уделяем особое внимание атмосфере, геймплею и качеству исполнения.</p><p>У DEXXURE Games есть собственный игровой Launcher — DG Launcher, в котором будет собрана большая часть наших текущих и будущих проектов. Это единая платформа для удобного доступа к нашим играм, обновлениям и новостям.</p><p>Мы активно развиваем своё сообщество:</p><ul><li>ведём собственный канал, где делимся прогрессом разработки, анонсами и закулисьем создания игр;</li></ul><p>DEXXURE Games™ — это развитие, идеи и постоянное движение вперёд. Мы делаем игры, в которые хотим играть сами.</p></div></template>
-  <template id="tmpl-settings"><div class="section"><h2 class="glitch" data-text="НАСТРОЙКИ">НАСТРОЙКИ</h2><form id="settings-form" class="settings-form"><label>Тема (в разработке):<select id="theme-select"><option value="cyber">Cyber</option><option value="acid">Acid</option><option value="dark">Dark</option></select></label><label>Громкость звуков (0-1):<input type="range" id="volume-range" min="0" max="1" step="0.1" value="0.8"><span id="volume-value">0.8</span></label><button type="submit">Сохранить настройки</button></form><p id="settings-status"></p><button id="logout-btn" style="margin-top:1rem; background:#330000;">Выйти</button></div></template>
+  <template id="tmpl-posts">
+    <div class="section active"><div id="posts-container">Загрузка постов...</div></div>
+  </template>
+  <template id="tmpl-team">
+    <div class="section">
+      <h2 class="glitch" data-text="НАША КОМАНДА">НАША КОМАНДА</h2>
+      <div class="team-member"><strong>Босс</strong> – @Dexxure<p>Основатель, главный идеолог.</p></div>
+      <div class="team-member"><strong>Разработчик</strong> – @code_ghost<p>Пишет код, оптимизирует баги.</p></div>
+      <p style="margin-top:1rem;">Полный состав появится позже, когда будут ссылки.</p>
+    </div>
+  </template>
+  <template id="tmpl-workshop">
+    <div class="section">
+      <h2 class="glitch" data-text="МАСТЕРСКАЯ">МАСТЕРСКАЯ</h2>
+      <p>Загружай свои моды для игр Dexxure Games.</p>
+      <form id="upload-mod-form" class="upload-form">
+        <input type="text" id="mod-name" placeholder="Название мода" required>
+        <textarea id="mod-desc" placeholder="Описание" rows="3"></textarea>
+        <input type="file" id="mod-file" required>
+        <button type="submit">Загрузить</button>
+      </form>
+      <div id="mods-list"></div>
+      <p class="small" style="margin-top:1rem;">Функция в стадии тестирования.</p>
+    </div>
+  </template>
+  <template id="tmpl-about">
+    <div class="section">
+      <h2 class="glitch" data-text="ИНФОРМАЦИЯ">ИНФОРМАЦИЯ</h2>
+      <p><strong>Dexxure Games &copy; 2023-2026 DEXXURE GAMES. Все права защищены.</strong></p>
+      <p>DEXXURE Games™ — независимая игровая команда, занимающаяся разработкой видеоигр на движках Unity. Мы создаём проекты разных жанров, экспериментируем с механиками и уделяем особое внимание атмосфере, геймплею и качеству исполнения.</p>
+      <p>У DEXXURE Games есть собственный игровой Launcher — DG Launcher, в котором будет собрана большая часть наших текущих и будущих проектов. Это единая платформа для удобного доступа к нашим играм, обновлениям и новостям.</p>
+      <p>Мы активно развиваем своё сообщество:</p>
+      <ul>
+        <li>ведём собственный канал, где делимся прогрессом разработки, анонсами и закулисьем создания игр;</li>
+      </ul>
+      <p>DEXXURE Games™ — это развитие, идеи и постоянное движение вперёд. Мы делаем игры, в которые хотим играть сами.</p>
+    </div>
+  </template>
+  <template id="tmpl-settings">
+    <div class="section">
+      <h2 class="glitch" data-text="НАСТРОЙКИ">НАСТРОЙКИ</h2>
+      <button id="logout-btn" style="margin-top:1rem; background:#330000;">Выйти из аккаунта</button>
+    </div>
+  </template>
 `;
 document.body.insertAdjacentHTML("beforeend", templatesHTML);
 
@@ -99,7 +123,7 @@ function updateAvatar(url) {
 
 avatarContainer.addEventListener("click", () => {
   if (!currentUser) return;
-  const currentUrl = currentSettings.avatar_url || "";
+  const currentUrl = currentSettings?.avatar_url || "";
   const newUrl = prompt("Введите URL изображения для аватара:", currentUrl);
   if (newUrl !== null) {
     (async () => {
@@ -127,7 +151,7 @@ function showSection(sectionId) {
     const clone = template.content.cloneNode(true);
     main.appendChild(clone);
   } else {
-    main.innerHTML = "<p>Раздел не найден</p>";
+    main.innerHTML = `<p>Раздел "${sectionId}" не найден</p>`;
   }
 
   if (sectionId === "settings") initSettings();
@@ -183,35 +207,25 @@ function initWorkshop() {
   }
 }
 
-// ---------- Settings section ----------
+// ---------- Settings (упрощённая) ----------
 let currentSettings = { theme: "cyber", volume: 0.8, avatar_url: null };
 
-async function initSettings() {
-  currentSettings = await loadSettings();
-  const themeSelect = document.getElementById("theme-select");
-  const volumeRange = document.getElementById("volume-range");
-  const volumeValue = document.getElementById("volume-value");
-  const status = document.getElementById("settings-status");
+async function loadSettings() {
+  const token = getToken();
+  const { ok, data } = await api("loadSettings", { token });
+  return (ok && data) ? data : { theme: "cyber", volume: 0.8, avatar_url: null };
+}
 
-  if (themeSelect) themeSelect.value = currentSettings.theme;
-  if (volumeRange) {
-    volumeRange.value = currentSettings.volume;
-    volumeValue.textContent = currentSettings.volume;
-    volumeRange.oninput = () => { volumeValue.textContent = volumeRange.value; };
-  }
+async function saveSettings(theme, volume, avatar_url = undefined) {
+  const token = getToken();
+  const payload = { token, theme, volume };
+  if (avatar_url !== undefined) payload.avatar_url = avatar_url;
+  const { ok } = await api("saveSettings", payload);
+  return ok;
+}
 
-  const form = document.getElementById("settings-form");
-  if (form) {
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const ok = await saveSettings(themeSelect.value, parseFloat(volumeRange.value));
-      if (status) {
-        status.textContent = ok ? "Настройки сохранены." : "Ошибка сохранения.";
-        status.style.color = ok ? "var(--acid)" : "red";
-      }
-    });
-  }
-
+function initSettings() {
+  // Только выход
   document.getElementById("logout-btn")?.addEventListener("click", async () => {
     await api("signout", { token: getToken() });
     clearToken();
@@ -220,8 +234,6 @@ async function initSettings() {
     updateAvatar(null);
     showAuthForm("signin");
   });
-
-  updateAvatar(currentSettings.avatar_url);
 }
 
 // ---------- Auth Form ----------
@@ -235,8 +247,8 @@ function showAuthForm(mode = "signin") {
         <button type="submit">${mode === 'signin' ? 'Войти' : 'Зарегистрироваться'}</button>
       </form>
       <p id="auth-switch">
-        ${mode === 'signin' 
-          ? 'Нет аккаунта? <a href="#" id="switch-to-signup">Регистрация</a>' 
+        ${mode === 'signin'
+          ? 'Нет аккаунта? <a href="#" id="switch-to-signup">Регистрация</a>'
           : 'Есть аккаунт? <a href="#" id="switch-to-signin">Войти</a>'}
       </p>
       <p id="auth-error" style="color:red;"></p>
@@ -252,13 +264,12 @@ function showAuthForm(mode = "signin") {
 
     if (ok) {
       if (mode === "signup") {
-        // После регистрации сразу входим
         const signinRes = await api("signin", { email, password });
         if (signinRes.ok) {
           setToken(signinRes.data.session.access_token);
           initApp();
         } else {
-          document.getElementById("auth-error").textContent = 
+          document.getElementById("auth-error").textContent =
             "Регистрация прошла, но войти не удалось. Попробуйте войти вручную.";
         }
       } else {
