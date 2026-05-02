@@ -1,7 +1,5 @@
-// Без ключей, только URL функции
 const API_URL = "https://llihkhqbixjgvcltcajn.supabase.co/functions/v1/api";
 
-// Универсальный запрос
 async function api(action, payload = {}) {
   const resp = await fetch(API_URL, {
     method: "POST",
@@ -11,27 +9,17 @@ async function api(action, payload = {}) {
   return resp.json();
 }
 
-// ----- Аутентификация -----
+// ---------- Аутентификация ----------
 const AUTH_KEY = "dexxure_auth_token";
-
-function getToken() {
-  return localStorage.getItem(AUTH_KEY);
-}
-
-function setToken(token) {
-  localStorage.setItem(AUTH_KEY, token);
-}
-
-function clearToken() {
-  localStorage.removeItem(AUTH_KEY);
-}
+function getToken() { return localStorage.getItem(AUTH_KEY); }
+function setToken(token) { localStorage.setItem(AUTH_KEY, token); }
+function clearToken() { localStorage.removeItem(AUTH_KEY); }
 
 let currentUser = null;
 
 async function checkAuth() {
   const token = getToken();
   if (!token) return false;
-
   const { ok, data } = await api("getUser", { token });
   if (ok && data) {
     currentUser = data;
@@ -42,21 +30,23 @@ async function checkAuth() {
   }
 }
 
-// ----- Сохранение настроек (с токеном) -----
+// ---------- Настройки ----------
 async function loadSettings() {
   const token = getToken();
   const response = await api("loadSettings", { token });
   if (response.ok && response.data) return response.data;
-  return { theme: "cyber", volume: 0.8 };
+  return { theme: "cyber", volume: 0.8, avatar_url: null };
 }
 
-async function saveSettings(theme, volume) {
+async function saveSettings(theme, volume, avatar_url = undefined) {
   const token = getToken();
-  const response = await api("saveSettings", { token, theme, volume });
+  const payload: any = { token, theme, volume };
+  if (avatar_url !== undefined) payload.avatar_url = avatar_url;
+  const response = await api("saveSettings", payload);
   return response.ok;
 }
 
-// ----- Матричный фон -----
+// ---------- Матричный фон ----------
 const canvas = document.getElementById("matrix");
 const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
@@ -77,7 +67,7 @@ function drawMatrix() {
 }
 setInterval(drawMatrix, 50);
 
-// ----- Готовим шаблоны заранее -----
+// ---------- Шаблоны (вставляются сразу) ----------
 const templatesHTML = `
   <template id="tmpl-posts">
     <div class="section active">
@@ -88,14 +78,8 @@ const templatesHTML = `
   <template id="tmpl-team">
     <div class="section">
       <h2 class="glitch" data-text="НАША КОМАНДА">НАША КОМАНДА</h2>
-      <div class="team-member">
-        <strong>Босс</strong> – @Dexxure
-        <p>Основатель, главный идеолог.</p>
-      </div>
-      <div class="team-member">
-        <strong>Разработчик</strong> – @code_ghost
-        <p>Пишет код, оптимизирует баги.</p>
-      </div>
+      <div class="team-member"><strong>Босс</strong> – @Dexxure<p>Основатель, главный идеолог.</p></div>
+      <div class="team-member"><strong>Разработчик</strong> – @code_ghost<p>Пишет код, оптимизирует баги.</p></div>
       <p style="margin-top:1rem;">Полный состав появится позже, когда будут ссылки.</p>
     </div>
   </template>
@@ -119,13 +103,11 @@ const templatesHTML = `
     <div class="section">
       <h2 class="glitch" data-text="ИНФОРМАЦИЯ">ИНФОРМАЦИЯ</h2>
       <p><strong>Dexxure Games &copy; 2023-2026 DEXXURE GAMES. Все права защищены.</strong></p>
-      <p>DEXXURE Games&trade; — независимая игровая команда, занимающаяся разработкой видеоигр на движках Unity. Мы создаём проекты разных жанров, экспериментируем с механиками и уделяем особое внимание атмосфере, геймплею и качеству исполнения.</p>
+      <p>DEXXURE Games™ — независимая игровая команда, занимающаяся разработкой видеоигр на движках Unity. Мы создаём проекты разных жанров, экспериментируем с механиками и уделяем особое внимание атмосфере, геймплею и качеству исполнения.</p>
       <p>У DEXXURE Games есть собственный игровой Launcher — DG Launcher, в котором будет собрана большая часть наших текущих и будущих проектов. Это единая платформа для удобного доступа к нашим играм, обновлениям и новостям.</p>
       <p>Мы активно развиваем своё сообщество:</p>
-      <ul>
-        <li>ведём собственный канал, где делимся прогрессом разработки, анонсами и закулисьем создания игр;</li>
-      </ul>
-      <p>DEXXURE Games&trade; — это развитие, идеи и постоянное движение вперёд. Мы делаем игры, в которые хотим играть сами.</p>
+      <ul><li>ведём собственный канал, где делимся прогрессом разработки, анонсами и закулисьем создания игр;</li></ul>
+      <p>DEXXURE Games™ — это развитие, идеи и постоянное движение вперёд. Мы делаем игры, в которые хотим играть сами.</p>
     </div>
   </template>
 
@@ -149,18 +131,24 @@ const templatesHTML = `
         <button type="submit">Сохранить настройки</button>
       </form>
       <p id="settings-status"></p>
-      <button id="logout-btn" style="margin-top:1rem; background: #330000;">Выйти</button>
+      <button id="logout-btn" style="margin-top:1rem; background:#330000;">Выйти</button>
     </div>
   </template>
 `;
 
-// Вставляем шаблоны в body сразу, до вызова initApp
 document.body.insertAdjacentHTML("beforeend", templatesHTML);
 
-// ----- Навигация -----
+// ---------- Аватар в хедере ----------
+// Создаём контейнер аватара в правом верхнем углу
+const avatarContainer = document.createElement("div");
+avatarContainer.id = "avatar-container";
+avatarContainer.innerHTML = `<img id="user-avatar-img" src="" alt="avatar" title="Нажми, чтобы изменить аватар" style="display:none;">`;
+document.body.appendChild(avatarContainer);
+
+// Кнопка выхода (будет вставлена позже, но можно и тут)
+// ---------- Навигация ----------
 const nav = document.querySelector("nav");
 nav.style.display = "none";
-
 const main = document.getElementById("app");
 const navLinks = document.querySelectorAll(".nav-link");
 
@@ -197,29 +185,23 @@ window.addEventListener("popstate", () => {
   showSection(section);
 });
 
-// ----- Функции разделов -----
+// ---------- Функции разделов ----------
 async function loadPosts() {
   const container = document.getElementById("posts-container");
   if (!container) return;
-
   const { ok, data, error } = await api("getPosts");
-  if (!ok) {
-    container.innerHTML = "Ошибка загрузки постов.";
-    return;
-  }
+  if (!ok) { container.innerHTML = "Ошибка загрузки постов."; return; }
   if (data.length === 0) {
     container.innerHTML = "Постов пока нет. Они появятся после первого запуска парсинга Telegram.";
     return;
   }
-  container.innerHTML = data
-    .map(
-      (post) => `
+  container.innerHTML = data.map(
+    (post) => `
     <div class="post-card">
       <time>${new Date(post.posted_at).toLocaleString("ru-RU")}</time>
       <div>${post.content.replace(/\n/g, "<br>")}</div>
     </div>`
-    )
-    .join("");
+  ).join("");
 }
 
 function initWorkshop() {
@@ -232,7 +214,7 @@ function initWorkshop() {
   }
 }
 
-let currentSettings = { theme: "cyber", volume: 0.8 };
+let currentSettings = { theme: "cyber", volume: 0.8, avatar_url: null };
 
 async function initSettings() {
   currentSettings = await loadSettings();
@@ -271,11 +253,46 @@ async function initSettings() {
     clearToken();
     currentUser = null;
     nav.style.display = "none";
+    updateAvatar(null);
     showAuthForm("signin");
   });
+
+  updateAvatar(currentSettings.avatar_url);
 }
 
-// ----- Форма входа -----
+// ---------- Аватар: управление ----------
+function updateAvatar(url) {
+  const img = document.getElementById("user-avatar-img");
+  if (url) {
+    img.src = url;
+    img.style.display = "block";
+    img.onerror = () => { img.style.display = "none"; };
+  } else {
+    img.src = "";
+    img.style.display = "none";
+  }
+}
+
+// При клике на аватар – запрос URL
+document.getElementById("avatar-container").addEventListener("click", () => {
+  if (!currentUser) return; // только после входа
+
+  const newUrl = prompt("Введите URL изображения для аватара:", currentSettings.avatar_url || "");
+  if (newUrl !== null) {
+    (async () => {
+      const success = await saveSettings(currentSettings.theme, currentSettings.volume, newUrl);
+      if (success) {
+        currentSettings.avatar_url = newUrl;
+        updateAvatar(newUrl);
+        alert("Аватар обновлён!");
+      } else {
+        alert("Не удалось сохранить аватар.");
+      }
+    })();
+  }
+});
+
+// ---------- Форма входа ----------
 function showAuthForm(mode = "signin") {
   main.innerHTML = `
     <div class="auth-form">
@@ -329,14 +346,18 @@ function showAuthForm(mode = "signin") {
   });
 }
 
-// Инициализация основного интерфейса после входа
+// ---------- Инициализация после входа ----------
 async function initApp() {
   nav.style.display = "flex";
+  // Загружаем настройки, чтобы получить аватар
+  currentSettings = await loadSettings();
+  updateAvatar(currentSettings.avatar_url);
+
   const initialSection = location.hash.slice(1) || "posts";
   showSection(initialSection);
 }
 
-// Старт приложения
+// ---------- Старт ----------
 (async () => {
   const isLogged = await checkAuth();
   if (isLogged) {
