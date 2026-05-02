@@ -54,56 +54,6 @@ function drawMatrix() {
 }
 setInterval(drawMatrix, 50);
 
-// ---------- HTML-строки разделов ----------
-const sections = {
-  posts: `
-    <div class="section active">
-      <div id="posts-container">Загрузка постов...</div>
-    </div>
-  `,
-  team: `
-    <div class="section">
-      <h2 class="glitch" data-text="НАША КОМАНДА">НАША КОМАНДА</h2>
-      <div class="team-member"><strong>Босс</strong> – @Dexxure<p>Основатель, главный идеолог.</p></div>
-      <div class="team-member"><strong>Разработчик</strong> – @code_ghost<p>Пишет код, оптимизирует баги.</p></div>
-      <p style="margin-top:1rem;">Полный состав появится позже, когда будут ссылки.</p>
-    </div>
-  `,
-  workshop: `
-    <div class="section">
-      <h2 class="glitch" data-text="МАСТЕРСКАЯ">МАСТЕРСКАЯ</h2>
-      <p>Загружай свои моды для игр Dexxure Games.</p>
-      <form id="upload-mod-form" class="upload-form">
-        <input type="text" id="mod-name" placeholder="Название мода" required>
-        <textarea id="mod-desc" placeholder="Описание" rows="3"></textarea>
-        <input type="file" id="mod-file" required>
-        <button type="submit">Загрузить</button>
-      </form>
-      <div id="mods-list"></div>
-      <p class="small" style="margin-top:1rem;">Функция в стадии тестирования.</p>
-    </div>
-  `,
-  about: `
-    <div class="section">
-      <h2 class="glitch" data-text="ИНФОРМАЦИЯ">ИНФОРМАЦИЯ</h2>
-      <p><strong>Dexxure Games &copy; 2023-2026 DEXXURE GAMES. Все права защищены.</strong></p>
-      <p>DEXXURE Games™ — независимая игровая команда, занимающаяся разработкой видеоигр на движках Unity. Мы создаём проекты разных жанров, экспериментируем с механиками и уделяем особое внимание атмосфере, геймплею и качеству исполнения.</p>
-      <p>У DEXXURE Games есть собственный игровой Launcher — DG Launcher, в котором будет собрана большая часть наших текущих и будущих проектов. Это единая платформа для удобного доступа к нашим играм, обновлениям и новостям.</p>
-      <p>Мы активно развиваем своё сообщество:</p>
-      <ul>
-        <li>ведём собственный канал, где делимся прогрессом разработки, анонсами и закулисьем создания игр;</li>
-      </ul>
-      <p>DEXXURE Games™ — это развитие, идеи и постоянное движение вперёд. Мы делаем игры, в которые хотим играть сами.</p>
-    </div>
-  `,
-  settings: `
-    <div class="section">
-      <h2 class="glitch" data-text="НАСТРОЙКИ">НАСТРОЙКИ</h2>
-      <button id="logout-btn" style="margin-top:1rem; background:#330000;">Выйти из аккаунта</button>
-    </div>
-  `
-};
-
 // ---------- Avatar ----------
 const avatarContainer = document.createElement("div");
 avatarContainer.id = "avatar-container";
@@ -142,43 +92,47 @@ avatarContainer.addEventListener("click", () => {
 // ---------- Navigation ----------
 const nav = document.querySelector("nav");
 nav.style.display = "none";
-const main = document.getElementById("app");
 const navLinks = document.querySelectorAll(".nav-link");
 
 function showSection(sectionId) {
-  if (!sections[sectionId]) {
-    main.innerHTML = `<p>Раздел "${sectionId}" не найден</p>`;
-    return;
-  }
-  main.innerHTML = sections[sectionId];
+  // Скрываем все секции
+  document.querySelectorAll("#app .section").forEach(s => s.classList.remove("active"));
 
-  // Активируем нужные действия
-  if (sectionId === "settings") {
-    document.getElementById("logout-btn")?.addEventListener("click", async () => {
-      await api("signout", { token: getToken() });
-      clearToken();
-      currentUser = null;
-      nav.style.display = "none";
-      updateAvatar(null);
-      showAuthForm("signin");
-    });
+  // Показываем нужную секцию
+  const sectionEl = document.getElementById(`section-${sectionId}`);
+  if (sectionEl) {
+    sectionEl.classList.add("active");
+  } else {
+    // fallback
+    document.getElementById("section-posts")?.classList.add("active");
   }
-  if (sectionId === "posts") {
-    loadPosts();
-  }
+
+  // Дополнительная инициализация
+  if (sectionId === "posts") loadPosts();
   if (sectionId === "workshop") {
     const form = document.getElementById("upload-mod-form");
-    if (form) {
-      form.addEventListener("submit", (e) => {
-        e.preventDefault();
-        alert("Загрузка пока не подключена. Ждём интеграции Supabase Storage.");
+    if (form && !form.dataset.listener) {
+      form.dataset.listener = "true";
+      form.addEventListener("submit", (e) => { e.preventDefault(); alert("Загрузка в разработке."); });
+    }
+  }
+  if (sectionId === "settings") {
+    const logoutBtn = document.getElementById("logout-btn");
+    if (logoutBtn && !logoutBtn.dataset.listener) {
+      logoutBtn.dataset.listener = "true";
+      logoutBtn.addEventListener("click", async () => {
+        await api("signout", { token: getToken() });
+        clearToken();
+        currentUser = null;
+        nav.style.display = "none";
+        updateAvatar(null);
+        showAuthForm("signin");
       });
     }
   }
 
-  navLinks.forEach(link => {
-    link.classList.toggle("active", link.dataset.section === sectionId);
-  });
+  // Подсветка текущей ссылки
+  navLinks.forEach(link => link.classList.toggle("active", link.dataset.section === sectionId));
 }
 
 navLinks.forEach(link => {
@@ -200,14 +154,8 @@ async function loadPosts() {
   const container = document.getElementById("posts-container");
   if (!container) return;
   const { ok, data } = await api("getPosts");
-  if (!ok) {
-    container.innerHTML = "Ошибка загрузки.";
-    return;
-  }
-  if (data.length === 0) {
-    container.innerHTML = "Постов пока нет. Они появятся после первого запуска парсинга Telegram.";
-    return;
-  }
+  if (!ok) { container.innerHTML = "Ошибка загрузки."; return; }
+  if (data.length === 0) { container.innerHTML = "Постов пока нет."; return; }
   container.innerHTML = data.map(p => `
     <div class="post-card">
       <time>${new Date(p.posted_at).toLocaleString("ru-RU")}</time>
@@ -234,6 +182,11 @@ async function saveSettings(theme, volume, avatar_url = undefined) {
 
 // ---------- Auth Form ----------
 function showAuthForm(mode = "signin") {
+  // Скрываем все секции
+  document.querySelectorAll("#app .section").forEach(s => s.classList.remove("active"));
+
+  const main = document.getElementById("app");
+  // Вставляем форму авторизации
   main.innerHTML = `
     <div class="auth-form">
       <h2 class="glitch" data-text="${mode === 'signin' ? 'ВХОД' : 'РЕГИСТРАЦИЯ'}">${mode === 'signin' ? 'ВХОД' : 'РЕГИСТРАЦИЯ'}</h2>
@@ -259,14 +212,22 @@ function showAuthForm(mode = "signin") {
     const { ok, data, error } = await api(action, { email, password });
 
     if (ok) {
-      if (mode === "signup") {
-        const signinRes = await api("signin", { email, password });
-        if (signinRes.ok) {
-          setToken(signinRes.data.session.access_token);
+      if (action === "signup") {
+        // signUp теперь возвращает сессию, если не требуется подтверждение
+        if (data?.session?.access_token) {
+          setToken(data.session.access_token);
           initApp();
+        } else if (data?.user?.email_confirmed_at === null) {
+          document.getElementById("auth-error").textContent = "Требуется подтверждение email. Проверьте почту.";
         } else {
-          document.getElementById("auth-error").textContent =
-            "Регистрация прошла, но войти не удалось. Попробуйте войти вручную.";
+          // Пробуем signIn, если сессии нет (старая логика)
+          const signinRes = await api("signin", { email, password });
+          if (signinRes.ok) {
+            setToken(signinRes.data.session.access_token);
+            initApp();
+          } else {
+            document.getElementById("auth-error").textContent = "Не удалось войти после регистрации.";
+          }
         }
       } else {
         setToken(data.session.access_token);
@@ -277,19 +238,23 @@ function showAuthForm(mode = "signin") {
     }
   });
 
-  document.getElementById("switch-to-signup")?.addEventListener("click", (e) => {
-    e.preventDefault();
-    showAuthForm("signup");
-  });
-  document.getElementById("switch-to-signin")?.addEventListener("click", (e) => {
-    e.preventDefault();
-    showAuthForm("signin");
-  });
+  document.getElementById("switch-to-signup")?.addEventListener("click", (e) => { e.preventDefault(); showAuthForm("signup"); });
+  document.getElementById("switch-to-signin")?.addEventListener("click", (e) => { e.preventDefault(); showAuthForm("signin"); });
 }
 
 // ---------- Init after login ----------
 async function initApp() {
   nav.style.display = "flex";
+  // Восстанавливаем секции, если были удалены формой авторизации
+  const main = document.getElementById("app");
+  if (!document.getElementById("section-posts")) {
+    // если вдруг innerHTML стер секции, но такого быть не должно, но перестрахуемся
+    main.innerHTML = `
+      <div id="section-posts" class="section"><div id="posts-container">Загрузка постов...</div></div>
+      <div id="section-team" class="section"><h2 class="glitch" data-text="НАША КОМАНДА">НАША КОМАНДА</h2>...</div>
+      ...
+    `;
+  }
   currentSettings = await loadSettings();
   updateAvatar(currentSettings.avatar_url);
   showSection(location.hash.slice(1) || "posts");
@@ -306,6 +271,7 @@ async function initApp() {
     }
   } catch (e) {
     console.error("App start error", e);
-    main.innerHTML = `<div style="color:red;text-align:center;margin-top:2rem;">Критическая ошибка загрузки. Попробуйте обновить страницу.</div>`;
+    const main = document.getElementById("app");
+    main.innerHTML = `<div style="color:red;text-align:center;margin-top:2rem;">Критическая ошибка. Обновите страницу.</div>`;
   }
 })();
