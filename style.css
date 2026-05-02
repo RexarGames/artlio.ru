@@ -2,14 +2,9 @@
   --bg: #0a0a0a;
   --acid: #39ff14;
   --acid-dark: #0d8c00;
-  --glitch-shadow: rgba(57, 255, 20, 0.8);
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin:0; padding:0; box-sizing:border-box; }
 
 body {
   background: var(--bg);
@@ -24,10 +19,8 @@ body {
 
 #matrix {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top:0; left:0;
+  width:100%; height:100%;
   z-index: -1;
   opacity: 0.15;
 }
@@ -51,10 +44,8 @@ header {
 .glitch::after {
   content: attr(data-text);
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top:0; left:0;
+  width:100%; height:100%;
 }
 
 .glitch::before {
@@ -72,21 +63,21 @@ header {
 }
 
 @keyframes glitch-anim-1 {
-  0% { clip: rect(12px, 9999px, 87px, 0); }
-  20% { clip: rect(23px, 9999px, 34px, 0); }
-  40% { clip: rect(45px, 9999px, 12px, 0); }
-  60% { clip: rect(67px, 9999px, 78px, 0); }
-  80% { clip: rect(34px, 9999px, 56px, 0); }
-  100% { clip: rect(89px, 9999px, 98px, 0); }
+  0% { clip:rect(12px, 9999px, 87px, 0); }
+  20% { clip:rect(23px, 9999px, 34px, 0); }
+  40% { clip:rect(45px, 9999px, 12px, 0); }
+  60% { clip:rect(67px, 9999px, 78px, 0); }
+  80% { clip:rect(34px, 9999px, 56px, 0); }
+  100% { clip:rect(89px, 9999px, 98px, 0); }
 }
 
 @keyframes glitch-anim-2 {
-  0% { clip: rect(65px, 9999px, 34px, 0); }
-  20% { clip: rect(87px, 9999px, 12px, 0); }
-  40% { clip: rect(23px, 9999px, 76px, 0); }
-  60% { clip: rect(45px, 9999px, 98px, 0); }
-  80% { clip: rect(12px, 9999px, 54px, 0); }
-  100% { clip: rect(78px, 9999px, 33px, 0); }
+  0% { clip:rect(65px, 9999px, 34px, 0); }
+  20% { clip:rect(87px, 9999px, 12px, 0); }
+  40% { clip:rect(23px, 9999px, 76px, 0); }
+  60% { clip:rect(45px, 9999px, 98px, 0); }
+  80% { clip:rect(12px, 9999px, 54px, 0); }
+  100% { clip:rect(78px, 9999px, 33px, 0); }
 }
 
 nav {
@@ -107,6 +98,7 @@ nav {
   letter-spacing: 2px;
   transition: 0.3s;
   padding: 0.3rem 0.6rem;
+  cursor: pointer;
 }
 
 .nav-link:hover,
@@ -134,15 +126,15 @@ main {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity:0; transform:translateY(10px); }
+  to { opacity:1; transform:translateY(0); }
 }
 
 .post-card, .team-member, .mod-card {
   border: 1px solid var(--acid);
   padding: 1rem;
   margin-bottom: 1rem;
-  background: rgba(57, 255, 20, 0.03);
+  background: rgba(57,255,20,0.03);
 }
 
 .post-card time {
@@ -192,7 +184,7 @@ footer {
   color: #666;
 }
 
-/* ---------- Аватар ---------- */
+/* Аватар */
 #avatar-container {
   position: fixed;
   top: 1rem;
@@ -210,10 +202,9 @@ footer {
   height: 48px;
   border-radius: 50%;
   border: 2px solid var(--acid);
-  background: rgba(57, 255, 20, 0.1);
+  background: rgba(57,255,20,0.1);
   position: absolute;
-  top: 0;
-  left: 0;
+  top:0; left:0;
 }
 
 #user-avatar-img {
@@ -224,8 +215,7 @@ footer {
   object-fit: cover;
   background: black;
   position: absolute;
-  top: 0;
-  left: 0;
+  top:0; left:0;
   display: none;
   z-index: 2;
 }
