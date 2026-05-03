@@ -1,33 +1,64 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Dexxure Games — команда</title>
-  <meta name="description" content="Состав команды Dexxure Games.">
-  <link rel="preconnect" href="https://cdn.jsdelivr.net">
-  <link rel="stylesheet" href="../assets/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Команда — Dexxure Games</title>
+    <link rel="stylesheet" href="../assets/style.css">
 </head>
-<body data-page="team">
-  <div class="site-shell">
-    <header class="topbar">
-      <a class="brand" href="../home/"><span class="brand-mark">DG</span><span>Dexxure Games</span></a>
-      <button id="navToggle" class="menu-button" type="button">Меню</button>
-      <nav class="nav" aria-label="Навигация">
-        <a href="../home/">Главная</a><a href="../games/">Игры</a><a href="../posts/">Посты</a><a href="../team/">Команда</a><a href="../workshop/">Мастерская</a><a href="../about/">О команде</a><a href="../settings/">Настройки</a>
-      </nav>
-      <div class="account-line"><span id="userBadge">Profile</span><button id="logoutButton" type="button">Выйти</button></div>
+<body>
+    <header class="shell topbar">
+        <a class="brand" href="/">
+            <span class="logo">DG</span>
+            <span>Dexxure Games</span>
+        </a>
+
+        <button class="mobile-menu" data-menu>Меню</button>
+
+        <nav class="nav" data-nav>
+            <a href="/">Главная</a>
+            <a href="/games/">Игры</a>
+            <a href="/posts/">Посты</a>
+            <a href="/team/">Команда</a>
+            <a href="/workshop/">Мастерская</a>
+            <a href="/about/">О команде</a>
+            <a href="/settings/">Настройки</a>
+        </nav>
+
+        <div class="account">
+            <span>karina.kurbatova.1991@ma...</span>
+            <button class="logout">Выйти</button>
+        </div>
     </header>
-    <main>
-      <section class="page-title">
-        <p class="eyebrow">Team</p>
-        <h1>Состав команды</h1>
-        <p>Роли участников Dexxure Games без лишнего текста и искусственных описаний.</p>
-      </section>
-      <section id="teamGrid" class="team-grid"></section>
+
+    <main class="shell page">
+        <span class="kicker">Team</span>
+        <h1 class="page-title">Команда</h1>
+
+
+        <section class="section">
+            <h2>Состав</h2>
+            <div class="grid">
+                <article class="card">
+                    <h3>Dexxure Games</h3>
+                    <div class="meta">Studio</div>
+                </article>
+                <article class="card">
+                    <h3>Development</h3>
+                    <div class="meta">Unity</div>
+                </article>
+                <article class="card">
+                    <h3>Design</h3>
+                    <div class="meta">Interface</div>
+                </article>
+            </div>
+        </section>
+
+
+        <div class="notice">
+            В сети могут появляться фейковые сайты и копии Dexxure Games. Проверяйте адрес, ссылки и не скачивайте файлы из подозрительных источников.
+        </div>
     </main>
-    <footer class="site-footer">В сети могут появляться фейковые сайты и копии Dexxure Games. Проверяйте адрес, ссылки и не скачивайте файлы из подозрительных источников.</footer>
-  </div>
-  <script type="module" src="../assets/app.min.js"></script>
+    <script src="../assets/app.js"></script>
 </body>
 </html>

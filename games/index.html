@@ -1,42 +1,76 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Dexxure Games — игры</title>
-  <meta name="description" content="Игры и проекты Dexxure Games.">
-  <link rel="preconnect" href="https://cdn.jsdelivr.net">
-  <link rel="stylesheet" href="../assets/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игры — Dexxure Games</title>
+    <link rel="stylesheet" href="../assets/style.css">
 </head>
-<body data-page="games">
-  <div class="site-shell">
-    <header class="topbar">
-      <a class="brand" href="../home/"><span class="brand-mark">DG</span><span>Dexxure Games</span></a>
-      <button id="navToggle" class="menu-button" type="button">Меню</button>
-      <nav class="nav" aria-label="Навигация">
-        <a href="../home/">Главная</a><a href="../games/">Игры</a><a href="../posts/">Посты</a><a href="../team/">Команда</a><a href="../workshop/">Мастерская</a><a href="../about/">О команде</a><a href="../settings/">Настройки</a>
-      </nav>
-      <div class="account-line"><span id="userBadge">Profile</span><button id="logoutButton" type="button">Выйти</button></div>
+<body>
+    <header class="shell topbar">
+        <a class="brand" href="/">
+            <span class="logo">DG</span>
+            <span>Dexxure Games</span>
+        </a>
+
+        <button class="mobile-menu" data-menu>Меню</button>
+
+        <nav class="nav" data-nav>
+            <a href="/">Главная</a>
+            <a href="/games/">Игры</a>
+            <a href="/posts/">Посты</a>
+            <a href="/team/">Команда</a>
+            <a href="/workshop/">Мастерская</a>
+            <a href="/about/">О команде</a>
+            <a href="/settings/">Настройки</a>
+        </nav>
+
+        <div class="account">
+            <span>karina.kurbatova.1991@ma...</span>
+            <button class="logout">Выйти</button>
+        </div>
     </header>
-    <main>
-      <section class="page-title">
-        <p class="eyebrow">Projects index</p>
-        <h1>Игры Dexxure Games</h1>
-        <p>Список сделан по публичной странице itch.io. Поиск по слову “dexxure” тоже показывает эти проекты, потому что автор указан как DEXXURE GAMES.</p>
-      </section>
 
-      <section class="toolbar-card">
-        <label class="field field--search">
-          <span>Поиск</span>
-          <input id="gameSearch" type="search" placeholder="Например: dexxure, horror, unity, launcher">
-        </label>
-        <div class="mini-stat"><strong id="gamesCount">10</strong><span>игр найдено</span></div>
-      </section>
+    <main class="shell page">
+        <span class="kicker">Games</span>
+        <h1 class="page-title">Игры</h1>
 
-      <section id="gamesGrid" class="cards-grid"></section>
+
+        <section class="section">
+            <h2>Каталог</h2>
+            <div class="grid">
+                <article class="card">
+                    <h3>LUMI</h3>
+                    <div class="meta">Игра · Dexxure Games</div>
+                    <div class="actions">
+                        <button class="btn primary">Получить код</button>
+                        <a class="btn" href="https://rexar-games.itch.io/" target="_blank" rel="noopener">itch.io</a>
+                    </div>
+                </article>
+                <article class="card">
+                    <h3>Побег от Мишаны</h3>
+                    <div class="meta">Игра · Dexxure Games</div>
+                    <div class="actions">
+                        <button class="btn primary">Получить код</button>
+                        <a class="btn" href="https://rexar-games.itch.io/" target="_blank" rel="noopener">itch.io</a>
+                    </div>
+                </article>
+                <article class="card">
+                    <h3>Копать стену ложкой</h3>
+                    <div class="meta">Игра · Dexxure Games</div>
+                    <div class="actions">
+                        <button class="btn primary">Получить код</button>
+                        <a class="btn" href="https://rexar-games.itch.io/" target="_blank" rel="noopener">itch.io</a>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+
+        <div class="notice">
+            В сети могут появляться фейковые сайты и копии Dexxure Games. Проверяйте адрес, ссылки и не скачивайте файлы из подозрительных источников.
+        </div>
     </main>
-    <footer class="site-footer">В сети могут появляться фейковые сайты и копии Dexxure Games. Проверяйте адрес, ссылки и не скачивайте файлы из подозрительных источников.</footer>
-  </div>
-  <script type="module" src="../assets/app.min.js"></script>
+    <script src="../assets/app.js"></script>
 </body>
 </html>
