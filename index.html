@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dexxure Games — вход</title>
+  <meta name="description" content="Вход в портал Dexxure Games.">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="login" class="auth-screen">
+  <main class="auth-layout">
+    <section class="auth-copy">
+      <a class="brand brand--large" href="./" aria-label="Dexxure Games">
+        <span class="brand-mark">DG</span>
+        <span>Dexxure Games</span>
+      </a>
+      <p class="eyebrow">Portal access</p>
+      <h1>Вход в единый портал команды</h1>
+      <p class="lead">Новости, состав команды, мастерская модов, список проектов и личные настройки — в одном аккуратном интерфейсе.</p>
+      <div class="auth-note">
+        <span></span>
+        <p>Используй только официальный адрес сайта. Внизу портала есть предупреждение о фейковых копиях.</p>
+      </div>
+    </section>
+
+    <section class="auth-card" aria-label="Форма входа">
+      <div class="auth-card__head">
+        <h2>Вход</h2>
+        <p>Введи почту и пароль, чтобы перейти на сайт.</p>
+      </div>
+
+      <p id="authMessage" class="message-box" hidden></p>
+
+      <form id="loginForm" class="form-stack">
+        <label class="field">
+          <span>Email</span>
+          <input name="email" type="email" autocomplete="email" required placeholder="you@example.com">
+        </label>
+        <label class="field">
+          <span>Пароль</span>
+          <input name="password" type="password" autocomplete="current-password" required placeholder="Минимум 6 символов">
+        </label>
+        <button class="primary-button" type="submit">Войти</button>
+      </form>
+
+      <div class="auth-switch">
+        <span>Нет аккаунта?</span>
+        <a href="register/">Создать аккаунт</a>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="assets/app.min.js"></script>
+</body>
+</html>

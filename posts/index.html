@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dexxure Games — посты</title>
+  <meta name="description" content="Посты Dexxure Games из Telegram.">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-page="posts">
+  <div class="site-shell">
+    <header class="topbar">
+      <a class="brand" href="../home/"><span class="brand-mark">DG</span><span>Dexxure Games</span></a>
+      <button id="navToggle" class="menu-button" type="button">Меню</button>
+      <nav class="nav" aria-label="Навигация">
+        <a href="../home/">Главная</a><a href="../games/">Игры</a><a href="../posts/">Посты</a><a href="../team/">Команда</a><a href="../workshop/">Мастерская</a><a href="../about/">О команде</a><a href="../settings/">Настройки</a>
+      </nav>
+      <div class="account-line"><span id="userBadge">Profile</span><button id="logoutButton" type="button">Выйти</button></div>
+    </header>
+    <main>
+      <section class="page-title page-title--split">
+        <div>
+          <p class="eyebrow">Telegram</p>
+          <h1>Публикации команды</h1>
+        </div>
+        <a id="openChannel" class="primary-button" href="https://t.me/DexxureEnt" target="_blank" rel="noreferrer">Открыть канал</a>
+      </section>
+      <section id="postsGrid" class="cards-grid"></section>
+    </main>
+    <footer class="site-footer">В сети могут появляться фейковые сайты и копии Dexxure Games. Проверяйте адрес, ссылки и не скачивайте файлы из подозрительных источников.</footer>
+  </div>
+  <script type="module" src="../assets/app.min.js"></script>
+</body>
+</html>
