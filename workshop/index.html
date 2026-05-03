@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Мастерская — Dexxure Games</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <header class="container topbar">
+    <a class="brand" href="../">
+      <span class="logo">DG</span>
+      <span>Dexxure Games</span>
+    </a>
+
+    <button class="menu-btn" type="button" data-menu>Меню</button>
+
+    <nav class="nav" data-nav>
+      <a data-link href="../">Главная</a>
+      <a data-link href="../games/">Игры</a>
+      <a data-link href="../posts/">Посты</a>
+      <a data-link href="../team/">Команда</a>
+      <a data-link href="../workshop/">Мастерская</a>
+      <a data-link href="../about/">О команде</a>
+      <a data-link href="../settings/">Настройки</a>
+    </nav>
+
+    <div class="account">
+      <span class="account-mail">karina.kurbatova.1991@ma...</span>
+      <button class="pill-btn" type="button">Выйти</button>
+    </div>
+  </header>
+
+  <main class="container main">
+    <span class="kicker">Workshop</span>
+    <h1 class="page-title">Мастерская</h1>
+
+
+    <section class="section">
+      <div class="section-head">
+        <h2>Загрузка</h2>
+      </div>
+
+      <form class="form" data-mod-form>
+        <input class="field" name="title" type="text" placeholder="Название мода">
+        <input class="field" name="download_url" type="url" placeholder="Ссылка на файл">
+        <textarea class="field" name="description" placeholder="Комментарий"></textarea>
+        <button class="btn primary" type="submit">Отправить</button>
+        <div class="form-note" data-mod-note></div>
+      </form>
+    </section>
+
+
+    <div class="warning">
+      В сети могут появляться фейковые сайты и копии Dexxure Games. Проверяйте адрес, ссылки и не скачивайте файлы из подозрительных источников.
+    </div>
+  </main>
+
+  <script src="../assets/app.js"></script>
+</body>
+</html>
