@@ -39,8 +39,19 @@
           <button class="primary-button" type="submit">Отправить на проверку</button>
         </form>
         <section>
-          <div class="section-head section-head--tight"><div><p class="eyebrow">Approved / pending</p><h2>Список модов</h2></div></div>
+          <div class="section-head section-head--tight">
+            <div><p class="eyebrow">Approved</p><h2>Список модов</h2></div>
+            <button id="reviewModsButton" class="secondary-button" type="button" hidden>Проверка модов</button>
+          </div>
           <div id="modsGrid" class="cards-grid cards-grid--compact"></div>
+
+          <section id="reviewPanel" class="admin-panel" hidden>
+            <div class="section-head section-head--tight">
+              <div><p class="eyebrow">Link review</p><h2>Моды на проверке</h2></div>
+            </div>
+            <p id="reviewMessage" class="message-box" hidden></p>
+            <div id="reviewModsGrid" class="cards-grid cards-grid--compact"></div>
+          </section>
         </section>
       </section>
     </main>
